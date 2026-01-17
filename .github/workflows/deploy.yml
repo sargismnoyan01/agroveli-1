@@ -12,19 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        run: |
-          # Check if we have Node.js 18+ and npm
-          NODE_VERSION=$(node -v 2>/dev/null | cut -d'v' -f2 | cut -d'.' -f1 || echo "0")
-          if [ "$NODE_VERSION" -lt 18 ] || ! command -v npm &> /dev/null; then
-            echo "Installing Node.js 20..."
-            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-          fi
-          node -v
-          npm -v
-
+        
       - name: Install dependencies
         run: |
           npm ci
