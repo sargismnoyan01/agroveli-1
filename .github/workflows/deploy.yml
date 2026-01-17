@@ -51,5 +51,4 @@ jobs:
       - name: Health check
         run: |
           sleep 5
-          curl -f http://98.88.224.117:3000 || exit 1
-
+          curl -f http://127.0.0.1:3000 || exit 1
