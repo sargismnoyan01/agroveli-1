@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { Search, ChevronDown, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Link from "next/link";
 import { useGetProfileQuery } from "@/lib/store/services/authApi";
 import Logo from "@/components/shared/Logo";
+import Cookies from "js-cookie";
+import HeaderSearch from "@/components/layout/Search";
 
 const languages = [
   { code: "ru", name: "Русский", flag: "🇷🇺" },
@@ -30,9 +31,9 @@ const currencies = [
 export function Header() {
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0])
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0])
-  const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data } = useGetProfileQuery();
+  const token = Cookies.get('accessToken');
+  const { data } = useGetProfileQuery({skip: !token});
 
   return (
     <header className="sticky top-0 z-50 bg-[#E8E9EA] border-b border-border">
@@ -46,24 +47,9 @@ export function Header() {
             </Link>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Искать здесь"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-4 pr-10 h-10 rounded-md border-border shadow-md bg-background"
-                />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-transparent border-none cursor-pointer"
-                >
-                  <Search className="h-4 w-4 text-[#0F6A4F]"/>
-                </Button>
-              </div>
-            </div>
+            <Suspense fallback={null}>
+              <HeaderSearch />
+            </Suspense>
           </div>
 
           {/* Right Actions */}
@@ -103,9 +89,11 @@ export function Header() {
             </DropdownMenu>
 
             {/* Add Listing Button */}
-            <Button variant="outline" className="rounded-md px-6 h-10 bg-transparent text-[#0F6A4F] border-[#0F6A4F]">
-              Добавить
-            </Button>
+           <Link href={"/create"}>
+             <Button variant="outline" className="rounded-md px-6 h-10 bg-transparent text-[#0F6A4F] border-[#0F6A4F]">
+               Добавить
+             </Button>
+           </Link>
 
             {data?.info ?
               <Link href={"/"}>

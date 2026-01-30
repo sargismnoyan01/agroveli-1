@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { ChevronLeft, ChevronRight, Heart, Star, Tag } from "lucide-react"
+import React, { useState, useEffect } from "react"
+import { ChevronLeft, ChevronRight, Heart} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Swiper } from "swiper/react";
@@ -10,14 +10,13 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
 
-export function ProductCarousel({ title, products, badgeColor, badgeIcon }) {
+export function ProductCarousel({ title, products, badgeColor, BadgeIcon }) {
   const [favorites, setFavorites] = useState(products?.filter((p) => p.favorite).map((p) => p.id))
 
   const toggleFavorite = (productId) => {
     setFavorites((prev) => (prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]))
   }
 
-  const BadgeIcon = badgeIcon === "star" ? Star : Tag
 
   return (
     <section className="space-y-4">
@@ -29,7 +28,9 @@ export function ProductCarousel({ title, products, badgeColor, badgeIcon }) {
             badgeColor,
           )}
         >
-          <BadgeIcon className="h-4 w-4" />
+          <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", badgeColor)}>
+            <BadgeIcon className="h-5 w-5 text-white"/>
+          </div>
           <span>{title}</span>
         </div>
         <div className="flex items-center gap-2">

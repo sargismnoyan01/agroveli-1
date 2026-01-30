@@ -1,4 +1,3 @@
-
 @import "tw-animate-css";
 
 @plugin "tailwindcss-animate";
@@ -18,6 +17,10 @@
 }
 
 @theme {
+    --color-brand: #0F6A4F;
+    --color-premium-plus: #FFCC00;
+    --color-premium: #FF6400;
+
     --font-sans: var(--font-sans);
     /* Max-width breakpoints */
     --screen-3xl: 1810px;
@@ -280,12 +283,13 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
 
     }
-  body {
-    @apply bg-background text-foreground;
+
+    body {
+        @apply bg-background text-foreground;
 
     }
 

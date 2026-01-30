@@ -6,6 +6,7 @@ import { ProductCarousel } from "@/components/home/ProductCarusel";
 import { AdBanner } from "@/components/home/AddBanner";
 import { MobileNavigation } from "@/components/home/MobileNavigation";
 import { useGetProductsQuery } from "@/lib/store/services/productApi";
+import { Crown, Sparkles, Zap } from "lucide-react";
 
 
 const adBanners = [
@@ -34,29 +35,32 @@ export default function HomePage() {
       <main className="pb-20 md:pb-0">
         <CategoryFilters />
         <div className="container mx-auto px-4 py-6 space-y-8">
-          {premiumPlusProducts?.length > 0 && <ProductCarousel
+          {premiumPlusProducts?.premium_plus?.length > 0 && <ProductCarousel
             title="Premium +"
-            products={premiumPlusProducts}
-            badgeColor="bg-[#FFCC00]"
-            badgeIcon="star"
-          />}
-
-          <AdBanner banners={adBanners} />
-
-          {premiumProducts?.length > 0 && <ProductCarousel
-            title="Premium"
-            products={premiumProducts}
+            products={premiumPlusProducts.premium_plus}
+            BadgeIcon={Sparkles}
             badgeColor="bg-[#FF6400]"
-            badgeIcon="tag"
+
           />}
 
           <AdBanner banners={adBanners} />
 
-          {vipProducts?.length > 0 && <ProductCarousel
+          {premiumProducts?.premium?.length > 0 && <ProductCarousel
+            title="Premium"
+            products={premiumProducts.premium}
+            badgeColor="bg-[#FFCC00]"
+
+            BadgeIcon={Crown}
+          />}
+
+          <AdBanner banners={adBanners} />
+
+          {vipProducts?.vip?.length > 0 && <ProductCarousel
             title="VIP"
-            products={vipProducts}
+            products={vipProducts.vip}
             badgeColor="bg-[#0F6A4F]"
-            badgeIcon="vip"
+            BadgeIcon={Zap}
+
           />}
 
         </div>

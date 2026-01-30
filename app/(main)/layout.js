@@ -1,5 +1,5 @@
-import { Geist, Geist_Mono } from "next/font/google"
 import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 
 export const viewport = {
   themeColor: "#16a34a",
@@ -15,6 +15,7 @@ export default function RootLayout({
     <div>
       <Header />
       {children}
+      <Footer/>
     </div>
   )
 }
