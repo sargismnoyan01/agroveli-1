@@ -2,8 +2,9 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import PhoneInput from "react-phone-number-input";
+import { cn } from "@/lib/utils";
 
-export default function PhoneField({ label, error, value, onChange, ...props }) {
+export default function PhoneField({ label, error, value, onChange, className, ...props }) {
 
   return (
     <div className="space-y-2">
@@ -12,15 +13,15 @@ export default function PhoneField({ label, error, value, onChange, ...props }) 
         <PhoneInput
           international
           countryCallingCodeEditable={false}
-          defaultCountry="RU"
+          defaultCountry="GE"
           value={value}
           onChange={onChange}
-          className="w-full gap-1 h-12 pl-4 pr-[2px] overflow-hidden rounded-lg border border-gray-200 bg-white [&_input]:w-full [&_input]:h-[42px] [&_input]:border-none [&_input]:rounded-lg
+          className={cn(`w-full gap-1 h-12 pl-4 pr-[2px] overflow-hidden rounded-lg border border-gray-200 bg-white [&_input]:w-full [&_input]:h-[42px] [&_input]:border-none [&_input]:rounded-lg
              [&_input:focus]:outline-none
               [&_input:focus]:ring-2
               [&_input:focus]:ring-[#0F6A4F]
-              [&_input:focus]:border-transparent
-          "
+              [&_input:focus]:border-transparent`, className || "")}
+
           {...props}
         />
       </div>

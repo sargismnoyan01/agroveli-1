@@ -6,64 +6,31 @@ import { useState, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+
 import { cn } from "@/lib/utils"
 import {
   FileText,
   Pencil,
   Camera,
   DollarSign,
-  Phone,
   Zap,
   Crown,
   Sparkles,
   Check,
   X,
   ArrowLeft,
-  Carrot,
-  Apple,
-  Milk,
-  Wheat,
-  Sprout,
-  Wrench,
-  Tractor,
-  PawPrint,
   LayoutGrid,
 } from "lucide-react"
 import Link from "next/link"
+import { useCreateProductMutation } from "@/lib/store/services/productApi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { categories } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 
-const regions = [
-  { value: "tbilisi", label: "Тбилиси" },
-  { value: "batumi", label: "Батуми" },
-  { value: "kutaisi", label: "Кутаиси" },
-  { value: "rustavi", label: "Рустави" },
-  { value: "marneuli", label: "Марнеули" },
-  { value: "bolnisi", label: "Болниси" },
-  { value: "akhaltsikhe", label: "Ахалцихе" },
-]
-
-const countryCodes = [
-  { code: "+995", flag: "🇬🇪", country: "Georgia" },
-  { code: "+7", flag: "🇷🇺", country: "Russia" },
-  { code: "+1", flag: "🇺🇸", country: "USA" },
-  { code: "+44", flag: "🇬🇧", country: "UK" },
-]
-
-const categories = [
-  { id: "vegetables", label: "Овощи", icon: Carrot },
-  { id: "fruits", label: "Фрукты", icon: Apple },
-  { id: "dairy", label: "Молочные Продукты", icon: Milk },
-  { id: "grains", label: "Зерновые", icon: Wheat },
-  { id: "seedlings", label: "Саженцы", icon: Sprout },
-  { id: "tools", label: "Инструменты", icon: Wrench },
-  { id: "equipment", label: "Техника", icon: Tractor },
-  { id: "animals", label: "Животные", icon: PawPrint },
+const unitOptions = [
+  { value: "KG", label: "кг" },
+  { value: "L", label: "л" },
+  { value: "YEAR", label: "год" },
 ]
 
 const premiumPlans = [
@@ -115,21 +82,21 @@ const premiumPlans = [
 
 export default function CreateProductPage() {
   const [formData, setFormData] = useState({
-    region: "",
+    unit_of_measurement: "",
     productName: "",
     maxQuantity: "",
     description: "",
     price: "",
-    phone: "",
     countryCode: "+995",
     currency: "GEL",
-  })
+  });
+  const [create, { isLoading }] = useCreateProductMutation();
   const [selectedCategory, setSelectedCategory] = useState()
   const [errors, setErrors] = useState({})
   const [images, setImages] = useState([])
   const [selectedPlan, setSelectedPlan] = useState(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef(null)
+  const router  = useRouter();
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -197,8 +164,6 @@ export default function CreateProductPage() {
     }
     if (!formData.description.trim()) {
       newErrors.description = "Введите описание"
-    } else if (formData.description.trim().length < 20) {
-      newErrors.description = "Описание должно быть не менее 20 символов"
     }
     if (images.length === 0) {
       newErrors.images = "Добавьте хотя бы одно фото"
@@ -208,10 +173,8 @@ export default function CreateProductPage() {
     } else if (Number.isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
       newErrors.price = "Введите корректную цену"
     }
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Укажите номер телефона"
-    } else if (!/^\d{9}$/.test(formData.phone.replace(/\s/g, ""))) {
-      newErrors.phone = "Введите 9-значный номер"
+    if (!formData.unit_of_measurement.trim()) {
+      newErrors.unit_of_measurement = "Укажите единицу измерения"
     }
 
     setErrors(newErrors)
@@ -219,22 +182,48 @@ export default function CreateProductPage() {
   }
 
   const handleSubmit = async () => {
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsSubmitting(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitting(false)
-    alert("Товар успешно опубликован!")
-  }
+    const fd = new FormData();
+
+    // prices
+    if (formData.currency === "GEL") {
+      fd.append("price_lari", String(formData.price));
+      fd.append("price_type", "LARI");
+    } else {
+      fd.append("price_dram", String(formData.price));
+      fd.append("price_type", "DRAM");
+    }
+
+    // base fields
+    fd.append("name", formData.productName);
+    fd.append("location", formData.region);
+    fd.append("category", selectedCategory);
+    fd.append("count", String(Number(formData.maxQuantity)));
+    fd.append("description", formData.description);
+    fd.append("unit_of_measurement", formData.unit_of_measurement);
+
+    // images
+    images.forEach((img) => {
+      fd.append("images", img.file);
+    });
+
+    // send
+    const { data: res } = await create(fd);
+
+    if(res && res.id){
+      router.push(`/product/${res.id}`)
+    }
+
+  };
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <main className="flex-1 pb-20 md:pb-0">
-        <div className=" mx-auto px-8 md:px-10 lg:px-12 py-4 md:py-6">
+        <div className=" mx-auto px-4 md:px-10 lg:px-12 py-4 md:py-6">
           {/* Back Button - Mobile */}
           <div className="md:hidden mb-4">
-            <Link href="/public" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
+            <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="h-5 w-5"/>
               <span>Назад</span>
             </Link>
@@ -263,8 +252,8 @@ export default function CreateProductPage() {
                           : "bg-background text-foreground border-[#0F6A4F] hover:bg-emerald-50 ",
                       )}
                     >
-                      <Icon className={cn("h-3.5 w-3.5", isSelected ? "text-white": "text-brand")}/>
-                      <span className={cn("", isSelected ? "text-white": "text-brand")}>{category.label}</span>
+                      <Icon className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-brand")}/>
+                      <span className={cn("", isSelected ? "text-white" : "text-brand")}>{category.label}</span>
                     </button>
                   )
                 })}
@@ -283,23 +272,15 @@ export default function CreateProductPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Region */}
                 <div className="space-y-1.5">
-                  <Select value={formData.region} onValueChange={(v) => handleInputChange("region", v)}>
-                    <SelectTrigger
-                      className={cn(
-                        "h-11 rounded-lg",
-                        errors.region && "border-red-500 focus:ring-red-500"
-                      )}
-                    >
-                      <SelectValue placeholder="Страна / Регион"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {regions.map((region) => (
-                        <SelectItem key={region.value} value={region.value}>
-                          {region.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    placeholder="Страна / Регион"
+                    value={formData.region || ""}
+                    onChange={(e) => handleInputChange("region", e.target.value)}
+                    className={cn(
+                      "h-11 rounded-lg",
+                      errors.region && "border-red-500 focus:ring-red-500"
+                    )}
+                  />
                   {errors.region && <p className="text-xs text-red-500">{errors.region}</p>}
                 </div>
 
@@ -322,6 +303,7 @@ export default function CreateProductPage() {
                   <Input
                     placeholder="Макс. количество для продажи"
                     value={formData.maxQuantity}
+                    type="number"
                     onChange={(e) => handleInputChange("maxQuantity", e.target.value)}
                     className={cn(
                       "h-11 rounded-lg",
@@ -355,7 +337,8 @@ export default function CreateProductPage() {
             </section>
 
             {/* Price - Mobile Position */}
-            <section className="md:hidden bg-card rounded-xl border border-border p-4">
+            <section
+              className="md:hidden bg-card rounded-xl border border-border p-4  shadow-[0_0_20px_rgba(0,0,0,0.12)] mb-4">
               <div className="flex items-center gap-2 text-foreground font-medium mb-4">
                 <DollarSign className="h-5 w-5"/>
                 <span>Цена</span>
@@ -366,6 +349,7 @@ export default function CreateProductPage() {
                   <Input
                     placeholder="Укажите цену"
                     value={formData.price}
+                    type="number"
                     onChange={(e) => handleInputChange("price", e.target.value)}
                     className={cn(
                       "h-11 rounded-lg flex-1",
@@ -377,7 +361,7 @@ export default function CreateProductPage() {
                       type="button"
                       onClick={() => handleInputChange("currency", "GEL")}
                       className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+                        "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors border-0 cursor-pointer",
                         formData.currency === "GEL"
                           ? "bg-emerald-600 text-white"
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -387,66 +371,42 @@ export default function CreateProductPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleInputChange("currency", "USD")}
+                      onClick={() => handleInputChange("currency", "AMD")}
                       className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
-                        formData.currency === "USD"
+                        "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors border-0 cursor-pointer",
+                        formData.currency === "AMD"
                           ? "bg-emerald-600 text-white"
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
                       )}
                     >
-                      $
+                      ֏
                     </button>
-                    <span className="text-sm text-muted-foreground ml-1">/1kg</span>
-                  </div>
+                    {formData.unit_of_measurement ?  <span className="text-sm text-muted-foreground ml-1 text-nowrap">
+                        {`/${unitOptions.find(item => item.value === formData.unit_of_measurement)?.label}`}
+                      </span>: ""}                  </div>
                 </div>
                 {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}
               </div>
-            </section>
-
-            {/* Contact - Mobile Position */}
-            <section className="md:hidden bg-card rounded-xl border border-border p-4">
-              <div className="flex items-center gap-2 text-foreground font-medium mb-4">
-                <Phone className="h-5 w-5"/>
-                <span>Контакт</span>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <Select
-                    value={formData.countryCode}
-                    onValueChange={(v) => handleInputChange("countryCode", v)}
-                  >
-                    <SelectTrigger className="w-[100px] h-11 rounded-lg">
-                      <SelectValue>
-                        <span className="flex items-center gap-1.5">
-                          <span>{countryCodes.find((c) => c.code === formData.countryCode)?.flag}</span>
-                          <span>{formData.countryCode}</span>
-                        </span>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countryCodes.map((country) => (
-                        <SelectItem key={country.code} value={country.code}>
-                          <span className="flex items-center gap-2">
-                            <span>{country.flag}</span>
-                            <span>{country.code}</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    placeholder="Укажите номер телефона"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
+              <div className="mt-4">
+                <Select value={formData.unit_of_measurement} onValueChange={(v) => handleInputChange("unit_of_measurement", v)}>
+                  <SelectTrigger
                     className={cn(
-                      "h-11 rounded-lg flex-1",
-                      errors.phone && "border-red-500 focus:ring-red-500"
+                      "h-11 rounded-lg",
+                      errors.unit_of_measurement && "border-red-500 focus:ring-red-500"
                     )}
-                  />
-                </div>
-                {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
+                  >
+                    <SelectValue placeholder="Eдиница измерения"/>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {unitOptions.map((unit_of_measurement) => (
+                      <SelectItem key={unit_of_measurement.value} value={unit_of_measurement.value}>
+                        {unit_of_measurement.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.unit_of_measurement && <p className="text-xs text-red-500">{errors.unit_of_measurement}</p>}
+
               </div>
             </section>
 
@@ -515,92 +475,74 @@ export default function CreateProductPage() {
                 <span>Цена</span>
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-3">
-                  <Input
-                    placeholder="Укажите цену"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    className={cn(
-                      "h-11 rounded-lg max-w-xs",
-                      errors.price && "border-red-500 focus:ring-red-500"
-                    )}
-                  />
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleInputChange("currency", "GEL")}
+              <div className="flex gap-4 flex-wrap">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-3">
+                    <Input
+                      placeholder="Укажите цену"
+                      value={formData.price}
+                      type="number"
+                      onChange={(e) => handleInputChange("price", e.target.value)}
                       className={cn(
-                        "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors border-0 cursor-pointer",
-                        formData.currency === "GEL"
-                          ? "bg-emerald-600 text-white"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        "h-11 rounded-lg max-w-xs",
+                        errors.price && "border-red-500 focus:ring-red-500"
                       )}
-                    >
-                       ₾
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleInputChange("currency", "AMD")}
-                      className={cn(
-                        "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors border-0 cursor-pointer",
-                        formData.currency === "AMD"
-                          ? "bg-emerald-600 text-white"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      )}
-                    >
-                      ֏
-                    </button>
-                    <span className="text-sm text-muted-foreground ml-1">/1kg</span>
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleInputChange("currency", "GEL")}
+                        className={cn(
+                          "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors border-0 cursor-pointer",
+                          formData.currency === "GEL"
+                            ? "bg-emerald-600 text-white"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        )}
+                      >
+                        ₾
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleInputChange("currency", "AMD")}
+                        className={cn(
+                          "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors border-0 cursor-pointer",
+                          formData.currency === "AMD"
+                            ? "bg-emerald-600 text-white"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        )}
+                      >
+                        ֏
+                      </button>
+                      {formData.unit_of_measurement ?  <span className="text-sm text-muted-foreground ml-1 text-nowrap">
+                        {`/${unitOptions.find(item => item.value === formData.unit_of_measurement)?.label}`}
+                      </span>: ""}
+
+                    </div>
                   </div>
+                  {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}
                 </div>
-                {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}
-              </div>
-            </section>
-
-            {/* Contact - Desktop Position */}
-            <section className="hidden md:block bg-card rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-4 md:p-6 mb-4">
-              <div className="flex items-center gap-2 text-foreground font-medium mb-4">
-                <Phone className="h-5 w-5"/>
-                <span>Контакт</span>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2 max-w-md">
-                  <Select
-                    value={formData.countryCode}
-                    onValueChange={(v) => handleInputChange("countryCode", v)}
-                  >
-                    <SelectTrigger className="w-[110px] h-11 rounded-lg">
-                      <SelectValue>
-                        <span className="flex items-center gap-1.5">
-                          <span>{countryCodes.find((c) => c.code === formData.countryCode)?.flag}</span>
-                          <span>{formData.countryCode}</span>
-                        </span>
-                      </SelectValue>
+                <div className={"min-w-2/12"}>
+                  <Select value={formData.unit_of_measurement} onValueChange={(v) => handleInputChange("unit_of_measurement", v)}>
+                    <SelectTrigger
+                      className={cn(
+                        "h-11 rounded-lg",
+                        errors.unit_of_measurement && "border-red-500 focus:ring-red-500"
+                      )}
+                    >
+                      <SelectValue placeholder="Eдиница измерения"/>
                     </SelectTrigger>
                     <SelectContent>
-                      {countryCodes.map((country) => (
-                        <SelectItem key={country.code} value={country.code}>
-                          <span className="flex items-center gap-2">
-                            <span>{country.flag}</span>
-                            <span>{country.code}</span>
-                          </span>
+                      {unitOptions.map((unit_of_measurement) => (
+                        <SelectItem key={unit_of_measurement.value} value={unit_of_measurement.value}>
+                          {unit_of_measurement.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <Input
-                    placeholder="Укажите номер телефона"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    className={cn(
-                      "h-11 rounded-lg flex-1",
-                      errors.phone && "border-red-500 focus:ring-red-500"
-                    )}
-                  />
+                  {errors.unit_of_measurement && <p className="text-xs text-red-500">{errors.unit_of_measurement}</p>}
+
                 </div>
-                {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
+
               </div>
             </section>
 
@@ -686,10 +628,10 @@ export default function CreateProductPage() {
                 </p>
                 <Button
                   onClick={handleSubmit}
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-8 h-11"
                 >
-                  {isSubmitting ? "Публикация..." : "Опубликовать"}
+                  {isLoading ? "Публикация..." : "Опубликовать"}
                 </Button>
               </div>
             </section>

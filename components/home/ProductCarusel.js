@@ -10,7 +10,7 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
 
-export function ProductCarousel({ title, products, badgeColor, BadgeIcon }) {
+export function ProductCarousel({ title, products, badgeColor, BadgeIcon, path }) {
   const [favorites, setFavorites] = useState(products?.filter((p) => p.favorite).map((p) => p.id))
 
   const toggleFavorite = (productId) => {
@@ -22,9 +22,10 @@ export function ProductCarousel({ title, products, badgeColor, BadgeIcon }) {
     <section className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div
+        <Link
+          href={`/${path}`}
           className={cn(
-            "inline-flex h-12 items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium",
+            "inline-flex h-12 items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium no-underline",
             badgeColor,
           )}
         >
@@ -32,7 +33,7 @@ export function ProductCarousel({ title, products, badgeColor, BadgeIcon }) {
             <BadgeIcon className="h-5 w-5 text-white"/>
           </div>
           <span>{title}</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -65,6 +66,12 @@ export function ProductCarousel({ title, products, badgeColor, BadgeIcon }) {
         slidesPerView={4}
         autoplay={{ delay: 3000 }}
         loop={products.length > 4}
+        breakpoints={{
+          320: { slidesPerView: 1 },  // mobile
+          640: { slidesPerView: 2 },  // sm
+          768: { slidesPerView: 3 },  // md
+          1024: { slidesPerView: 4 }, // lg
+        }}
       >
         {products.map((product) => (
           <SwiperSlide key={product.id}>
@@ -117,7 +124,7 @@ function ProductCard({
   };
 
   return (
-    <Link href={`/products/${product.id}`} onClick={handleClick} className="block decoration-0 flex-shrink-0 w-full snap-start rounded-xl shadow-lg hover:shadow transition mb-8">
+    <Link href={`/product/${product.id}`} onClick={handleClick} className="block decoration-0 flex-shrink-0 w-full snap-start rounded-xl shadow-lg hover:shadow transition mb-8">
       <div className="relative group">
         {/* Image */}
         <div className="relative rounded-xl overflow-hidden bg-muted h-[200px]">
@@ -128,6 +135,7 @@ function ProductCard({
               clickable: true,
             }}
             modules={[Pagination, Autoplay]}
+            autoplay={{ delay: 3000 }}
             className={`
             h-full
             [&_.swiper-pagination-bullet-active]:!bg-[#0F6A4F]

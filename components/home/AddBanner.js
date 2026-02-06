@@ -3,16 +3,20 @@
 import { MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image";
+import Link from "next/link";
 
 
 export function AdBanner({ banners }) {
+
+  if(!banners.length) return;
+
   return (
     <section className="py-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {banners.map((banner) => (
-          <div key={banner.id} className="relative group rounded-xl overflow-hidden max-h-[270px]">
+          <Link href={banner.link} target="_blank" key={banner.id} className="relative group rounded-xl overflow-hidden max-h-[270px] no-underline">
             {/* Ad Label */}
-            <div className="absolute top-2 left-2 z-10 bg-[#FFFFFFCC] text-xs px-2 py-1 rounded">
+            <div className="absolute top-2 left-2 z-10 bg-[#FFFFFFCC] text-xs px-2 py-1 rounded no-underline decoration-0 text-black">
               Реклама
             </div>
 
@@ -35,7 +39,7 @@ export function AdBanner({ banners }) {
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
               />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

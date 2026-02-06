@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { ChevronDown, SlidersHorizontal, Search, Trash2, X } from "lucide-react"
+import React, { useState } from "react"
+import { ChevronDown, SlidersHorizontal, Search, Trash2, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
@@ -9,48 +9,20 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-
-
-const priceOptions = [
-  { value: "", label: "Все цены" },
-  { value: "0-10", label: "0 - 10₾" },
-  { value: "10-50", label: "10 - 50₾" },
-  { value: "50-100", label: "50 - 100₾" },
-  { value: "100+", label: "100₾+" },
-]
-
-const weightOptions = [
-  { value: "", label: "Все" },
-  { value: "1kg", label: "1 кг" },
-  { value: "5kg", label: "5 кг" },
-  { value: "10kg", label: "10 кг" },
-  { value: "50kg", label: "50 кг" },
-]
-
-const locationOptions = [
-  { value: "", label: "Все локации" },
-  { value: "tbilisi", label: "Тбилиси" },
-  { value: "marneuli", label: "Марнеули" },
-  { value: "bolnisi", label: "Болниси" },
-  { value: "akhaltsikhe", label: "Ахалцихе" },
-]
-
-const typeOptions = [
-  { value: "", label: "Все типы" },
-  { value: "vegetables", label: "Овощи" },
-  { value: "fruits", label: "Фрукты" },
-  { value: "dairy", label: "Молочные" },
-  { value: "grains", label: "Зерновые" },
-  { value: "equipment", label: "Техника" },
-]
+import { Input } from "@/components/ui/input";
+import { categories } from "@/lib/constants";
+import { initialFilters } from "@/components/search/SearchClient";
 
 const usageOrderOptions = [
   { value: "", label: "По умолчанию" },
-  { value: "newest", label: "Сначала новые" },
-  { value: "oldest", label: "Сначала старые" },
-  { value: "price-asc", label: "Дешевые сначала" },
-  { value: "price-desc", label: "Дорогие сначала" },
+  { value: "-created_at", label: "Сначала новые" },       // նորից հին
+  { value: "created_at", label: "Сначала старые" },       // հնից նոր
+  { value: "price_dram", label: "Дешевые сначала" },     // էժանից թանկ
+  { value: "-price_dram", label: "Дорогие сначала" },    // թանկից էժան
+  { value: "price_lari", label: "Дешевые сначала" },   // էժանից թանկ
+  { value: "-price_lari", label: "Дорогие сначала" },  // թանկից էժան
 ]
+
 
 function FilterDropdown({
                           label,
@@ -109,10 +81,12 @@ export function SearchFilters({
                                 variant = "sidebar",
                                 onClose,
                               }) {
-  const [sortOpen, setSortOpen] = useState(false)
+  const [sortOpen, setSortOpen] = useState(false);
+  const [innerFilters, setInnerFilters] = useState(filters || initialFilters)
+
 
   const updateFilter = (key, value) => {
-    onFiltersChange({ ...filters, [key]: value })
+    setInnerFilters({ ...innerFilters, [key]: value })
   }
 
   const isDrawer = variant === "drawer"
@@ -122,20 +96,20 @@ export function SearchFilters({
       {/* Header for Drawer */}
       {isDrawer && (
         <div className="flex items-center justify-between mb-6">
-          <button onClick={onClose} className="p-1">
-            <X className="h-5 w-5 text-muted-foreground" />
+          <button onClick={onClose} className="p-1 bg-transparent border-0">
+            <ChevronLeft className="h-6 w-6 text-muted-foreground" />
           </button>
           <h2 className="font-medium text-center flex-1">Детальный фильтр</h2>
           <button
             onClick={onReset}
-            className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+            className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors  bg-transparent border-0"
           >
             <Trash2 className="h-5 w-5" />
           </button>
         </div>
       )}
 
-      <div className="flex-1 space-y-4 overflow-y-auto flex flex-col gap-2 shadow-[0_0_20px_rgba(0,0,0,0.12)] rounded-lg p-3 mb-4">
+      <div className="flex-1 h-fit max-h-fit space-y-4 overflow-y-auto flex flex-col gap-2 shadow-[0_0_20px_rgba(0,0,0,0.12)] rounded-lg p-3 mb-4">
         {/* Sort Button */}
         <Collapsible open={sortOpen} onOpenChange={setSortOpen}>
           <CollapsibleTrigger className="w-full flex items-center justify-between p-3 border bg-transparent border-[#0F6A4F] rounded-lg hover:bg-emerald-50/50 transition-colors cursor-pointer">
@@ -152,8 +126,8 @@ export function SearchFilters({
                     setSortOpen(false)
                   }}
                   className={cn(
-                    "w-full text-left px-3 py-2 text-sm rounded-md transition-colors bg-transparent border-0",
-                    filters.usageOrder === option.value
+                    "w-full text-left px-3 py-2 text-sm rounded-md transition-colors bg-transparent border-0 cursor-pointer",
+                    innerFilters.usageOrder === option.value
                       ? "bg-emerald-50 text-emerald-700 font-medium"
                       : "hover:bg-muted"
                   )}
@@ -167,56 +141,58 @@ export function SearchFilters({
       </div>
 
       <div className="shadow-[0_0_20px_rgba(0,0,0,0.12)] rounded-lg p-3">
-        <div className="flex-1 space-y-4 overflow-y-auto flex flex-col gap-2 ">
-          {/* Filter Dropdowns */}
-          <FilterDropdown
-            label="Цена"
-            options={priceOptions}
-            value={filters.price.min ? `${filters.price.min}-${filters.price.max}` : ""}
-            onChange={(value) => {
-              if (value) {
-                const [min, max] = value.split("-")
-                updateFilter("price", { min, max: max || "" })
-              } else {
-                updateFilter("price", { min: "", max: "" })
-              }
-            }}
+        <div className="flex-1 space-y-4 flex flex-col gap-2 ">
+
+          <div className="flex items-center gap-2 justify-between">
+            <Input
+              placeholder="Цена от "
+              value={innerFilters.price_from || ""}
+              type="number"
+              max={innerFilters.price_to}
+              onChange={(e) => updateFilter("price_from", e.target.value)}
+              className={cn(
+                "h-11 rounded-lg flex-1",
+              )}
+            />
+            -
+            <Input
+              placeholder="Цена до "
+              value={innerFilters.price_to || ""}
+              min={innerFilters.price_from}
+              type="number"
+              onChange={(e) => updateFilter("price_to", e.target.value)}
+              className={cn(
+                "h-11 rounded-lg flex-1",
+              )}
+            />
+          </div>
+
+          <Input
+            placeholder="Локация"
+            value={innerFilters.location || ""}
+            onChange={(e) => updateFilter("location", e.target.value)}
+            className={cn(
+              "h-11 rounded-lg flex-1",
+            )}
           />
 
-          <FilterDropdown
-            label="Вес"
-            options={weightOptions}
-            value={filters.weight}
-            onChange={(value) => updateFilter("weight", value)}
-          />
 
           <FilterDropdown
-            label="Локация"
-            options={locationOptions}
-            value={filters.location}
-            onChange={(value) => updateFilter("location", value)}
-          />
-
-          <FilterDropdown
-            label="Тип"
-            options={typeOptions}
-            value={filters.type}
+            label="Категория"
+            options={categories}
+            value={innerFilters.type}
             onChange={(value) => updateFilter("type", value)}
-          />
-
-          <FilterDropdown
-            label="Порядок Использования"
-            options={usageOrderOptions}
-            value={filters.usageOrder}
-            onChange={(value) => updateFilter("usageOrder", value)}
           />
         </div>
 
         {/* Action Buttons */}
         <div className={cn("flex gap-3 pt-4", isDrawer ? "mt-auto" : "mt-6")}>
           <Button
-            onClick={onSearch}
-            className="flex-1 px-2 bg-brand text-white gap-2"
+            onClick={()=> {
+              onFiltersChange(innerFilters)
+              onSearch()
+            }}
+            className="flex-1 px-2 bg-brand text-white gap-2 hover:bg-brand cursor-pointer"
           >
             Поиск
             <Search className="h-4 w-4" />
@@ -224,9 +200,12 @@ export function SearchFilters({
           </Button>
           {!isDrawer && (
             <Button
-              onClick={onReset}
+              onClick={()=> {
+                setInnerFilters(initialFilters);
+                onReset()
+              }}
               variant="outline"
-              className="border-destructive px-2 text-destructive hover:bg-destructive/10 gap-2 bg-[#FF383C0D]"
+              className="border-destructive px-2 text-destructive hover:bg-destructive/10 gap-2 bg-[#FF383C0D] cursor-pointer"
             >
               Сбросить
               <Trash2 className="h-4 w-4" />

@@ -20,17 +20,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { categories } from "@/lib/constants";
 
-const categories = [
-  { id: "vegetables", label: "Овощи", icon: Carrot, active: true },
-  { id: "fruits", label: "Фрукты", icon: Apple, active: true },
-  { id: "dairy", label: "Молочные Продукты", icon: Milk, active: false },
-  { id: "grains", label: "Зерновые", icon: Wheat, active: false },
-  { id: "seedlings", label: "Саженцы", icon: Sprout, active: false },
-  { id: "tools", label: "Инструменты", icon: Wrench, active: false },
-  { id: "equipment", label: "Техника", icon: Tractor, active: false },
-  { id: "animals", label: "Животные", icon: PawPrint, active: false },
-]
 
 const filters = [
   { id: "price", label: "Цена" },

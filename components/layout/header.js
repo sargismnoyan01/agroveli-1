@@ -89,7 +89,7 @@ export function Header() {
             </DropdownMenu>
 
             {/* Add Listing Button */}
-           <Link href={"/create"}>
+           <Link href={ data?.info ? "/create": "/login"}>
              <Button variant="outline" className="rounded-md px-6 h-10 bg-transparent text-[#0F6A4F] border-[#0F6A4F]">
                Добавить
              </Button>
@@ -109,22 +109,19 @@ export function Header() {
         {/* Mobile/Tablet Header */}
         <div className="flex md:hidden items-center justify-between h-14 gap-3">
           {/* Logo */}
-          <div className="flex items-center">
-            <span className="text-xl font-bold">
-              <span className="text-[#0F6A4F]">Agro</span>
-              <span className="text-foreground">Veli</span>
-            </span>
-          </div>
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Logo/>
+          </Link>
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Button variant="ghost" size="icon" className="h-9 w-9 bg-transparent border-0">
               <Search className="h-5 w-5"/>
             </Button>
 
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Button variant="ghost" size="icon" className="h-9 w-9 bg-transparent border-0">
                   <Menu className="h-5 w-5"/>
                 </Button>
               </SheetTrigger>
@@ -136,8 +133,8 @@ export function Header() {
                       <button
                         key={lang.code}
                         onClick={() => setSelectedLanguage(lang)}
-                        className={`flex items-center gap-3 w-full p-2 rounded-lg ${
-                          selectedLanguage.code === lang.code ? "bg-emerald-50 text-[#0F6A4F]" : "hover:bg-muted"
+                        className={`flex items-center gap-3 w-full p-2 rounded-lg border-brand mb-1  ${
+                          selectedLanguage.code === lang.code ? "bg-brand text-white" : "bg-transparent hover:bg-muted"
                         }`}
                       >
                         <span className="text-lg">{lang.flag}</span>
@@ -151,8 +148,8 @@ export function Header() {
                       <button
                         key={currency.code}
                         onClick={() => setSelectedCurrency(currency)}
-                        className={`flex items-center gap-3 w-full p-2 rounded-lg ${
-                          selectedCurrency.code === currency.code ? "bg-emerald-50 text-emerald-700" : "hover:bg-muted"
+                        className={`flex items-center gap-3 w-full p-2 rounded-lg border-brand mb-1  ${
+                          selectedCurrency.code === currency.code ?  "bg-brand text-white"  : "bg-transparent hover:bg-muted"
                         }`}
                       >
                         <span>
@@ -161,7 +158,16 @@ export function Header() {
                       </button>
                     ))}
                   </div>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Войти</Button>
+
+                  {data?.info ?
+                    <Link className={"block w-full"} href={"/"}>
+                      <Button className="rounded-md px-6 h-10 w-full bg-[#0F6A4F] text-white">Профиль</Button>
+                    </Link> :
+                    <Link className={"block w-full"} href={"/login"}>
+                      <Button className="rounded-md w-full px-6 h-10 bg-[#0F6A4F] text-white">Войти</Button>
+                    </Link>
+                  }
+
                 </div>
               </SheetContent>
             </Sheet>

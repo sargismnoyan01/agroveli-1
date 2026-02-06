@@ -1,5 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { MobileNavigation } from "@/components/home/MobileNavigation";
+
 
 export const viewport = {
   themeColor: "#16a34a",
@@ -15,6 +17,7 @@ export default function RootLayout({
     <div>
       <Header />
       {children}
+      <MobileNavigation />
       <Footer/>
     </div>
   )
