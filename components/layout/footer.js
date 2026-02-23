@@ -1,8 +1,16 @@
 "use client"
 
 import { Instagram } from "lucide-react"
+import { useTranslations } from "next-intl"
+import Link from "next/link";
+import Cookies from "js-cookie";
+import { useGetProfileQuery } from "@/lib/store/services/authApi"; // Добавил импорт
 
 export function Footer() {
+  const t = useTranslations("Footer"); // Инициализация
+  const token = Cookies.get('accessToken');
+  const { data } = useGetProfileQuery({skip: !token});
+
   return (
     <footer className="bg-muted/50 border-t border-border mt-auto hidden md:block">
       <div className="container mx-auto px-4 py-10">
@@ -14,42 +22,42 @@ export function Footer() {
               <span className="text-foreground">veli</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              AgroVeli — это современная онлайн-площадка для поиска и продажи сельскохозяйственных товаров и техники.
+              {t("description")}
             </p>
           </div>
 
           {/* Navigation */}
           <div className="space-y-4">
-            <h3 className="font-medium text-foreground">Навигация</h3>
+            <h3 className="font-medium text-foreground">{t("navTitle")}</h3>
             <nav className="flex flex-col gap-2">
-              <a
-                href="#"
+              <Link
+                href={ data?.info ? "/create": "/login"}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+              >
+                {t("addProduct")}
+              </Link>
+              {!data?.info && <Link
+                href="/login"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Добавить Товар
-              </a>
-              <a
-                href="#"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Войти
-              </a>
+                {t("login")}
+              </Link>}
             </nav>
           </div>
 
           {/* Help */}
           <div className="space-y-4">
-            <h3 className="font-medium text-foreground">Помощь</h3>
+            <h3 className="font-medium text-foreground">{t("helpTitle")}</h3>
             <nav className="flex flex-col gap-2">
               <a
                 href="#"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
               >
-                Отправить сообщение
+                {t("sendMessage")}
               </a>
               <a
                 href="tel:+995322800045"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
               >
                 +995 32 280 00 45
               </a>
@@ -78,20 +86,20 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-10 pt-6 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            © 2025 Все права защищены
+            {t("copyright")}
           </p>
           <div className="flex items-center gap-4">
             <a
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Политика Конфиденциальности
+              {t("privacyPolicy")}
             </a>
             <a
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Условия Обслуживания
+              {t("terms")}
             </a>
           </div>
         </div>

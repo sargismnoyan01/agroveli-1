@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl"; // Добавил импорт
 
 export default function HeaderSearch() {
+  const t = useTranslations("Search"); // Инициализация
   const router = useRouter();
   const searchParams = useSearchParams()
   const q = searchParams.get('query')
@@ -29,7 +31,7 @@ export default function HeaderSearch() {
       <div className="relative">
         <Input
           type="text"
-          placeholder="Искать здесь"
+          placeholder={t("placeholder")} // Заменил текст на ключ
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-4 pr-10 h-10 rounded-md border-border shadow-md bg-background"
@@ -38,6 +40,7 @@ export default function HeaderSearch() {
           onClick={()=> {
             router.push(`/search?query=${searchQuery}`);
           }}
+          type="button" // Добавил тип для чистоты, так как есть onSubmit у формы
           size="icon"
           variant="ghost"
           className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-transparent border-none cursor-pointer"

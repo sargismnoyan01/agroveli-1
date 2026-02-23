@@ -8,7 +8,7 @@ const badgeIcons = {
   "VIP": <Zap className="h-5 w-5 text-white"/>
 }
 
-const titles = {
+export const statusTitles = {
   "PREMIUM_PLUS": "Premium +",
   "PREMIUM": "Premium",
   "VIP": "VIP"
@@ -32,7 +32,7 @@ export default function StatusBadge({status}) {
       <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", colors[status],)}>
         {badgeIcons[status]}
       </div>
-      <span>{titles[status]}</span>
+      <span>{statusTitles[status]}</span>
     </div>
   )
 }

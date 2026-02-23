@@ -1,5 +1,5 @@
-@import "tw-animate-css";
 
+@import "tw-animate-css";
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -293,4 +293,14 @@
 
     }
 
+}
+
+button{
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+a{
+    text-underline: none;
 }

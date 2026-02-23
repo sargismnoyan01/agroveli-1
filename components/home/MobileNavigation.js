@@ -2,26 +2,25 @@
 
 import { Home, PlusSquare, Heart, User } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useTranslations } from "next-intl" // Добавил импорт
 import Cookies from "js-cookie";
 import { useGetProfileQuery } from "@/lib/store/services/authApi";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-
-
 export function MobileNavigation() {
+  const t = useTranslations("MobileNav"); // Инициализация
   const pathname = usePathname();
   const token = Cookies.get('accessToken');
   const { data } = useGetProfileQuery({skip: !token});
 
   const navItems = [
-    { id: "/", label: "Главная", icon: Home },
-    { id: "/create", label: "Добавить", icon: PlusSquare },
-    { id: "/favorites", label: "Фаворит", icon: Heart },
+    { id: "/", label: t("home"), icon: Home },
+    { id: "/create", label: t("add"), icon: PlusSquare },
+    { id: "/profile/favorites", label: t("favorites"), icon: Heart },
     ...(data?.info
-        ? [{ id: "/profile", label: "Профиль", icon: User }]
-        : [{ id: "/login", label: "Войти", icon: User }]
+        ? [{ id: "/profile", label: t("profile"), icon: User }]
+        : [{ id: "/login", label: t("login"), icon: User }]
     ),
   ]
 
@@ -30,9 +29,7 @@ export function MobileNavigation() {
       <div className="flex items-center justify-around h-16 px-4">
         {navItems.map((item) => {
           const Icon = item.icon
-          const isActive =pathname === item.id;
-
-
+          const isActive = pathname === item.id;
 
           return (
             <Link

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Grid3X3, List, SlidersHorizontal, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -11,9 +11,9 @@ import { useGetProductsQuery } from "@/lib/store/services/productApi";
 import { ProductCardSkeleton } from "@/components/shared/ProductCardSkeleton";
 import CustomPagination from "@/components/shared/CustomPagination";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl"; // Добавлен импорт
 
 export const initialFilters = {
-  price: { min: "", max: "" },
   price_from: "",
   price_to: "",
   weight: "",
@@ -23,12 +23,26 @@ export const initialFilters = {
 }
 
 export default function SearchClient() {
+  const t = useTranslations("SearchClient"); // Инициализация хука
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState("grid")
   const [filters, setFilters] = useState(initialFilters)
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const searchParams = useSearchParams();
-  const q = searchParams.get('query')
+  const q = searchParams.get('query');
+
+  useEffect(() => {
+    const updatedFilters = { ...initialFilters };
+
+    Object.keys(initialFilters).forEach((key) => {
+      const valueFromUrl = searchParams.get(key);
+      if (valueFromUrl) {
+        updatedFilters[key] = valueFromUrl;
+      }
+    });
+
+    setFilters(updatedFilters);
+  }, [searchParams]);
 
   const { data, isLoading, isFetching } = useGetProductsQuery({
     global: true,
@@ -36,7 +50,7 @@ export default function SearchClient() {
     price_lari__gte: filters.price_from,
     price_lari__lte: filters.price_to,
     category: filters.type,
-    search: q,
+    search: q || "",
     location: filters.location,
     ordering: filters.usageOrder,
   });
@@ -54,13 +68,13 @@ export default function SearchClient() {
   }
 
 
-  const totalResults = data?.total_items;
+  const totalResults = data?.total_items || 0; // Добавлено 0 для корректной работы плюрализации
   const totalPages = data?.total_pages;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
 
-      <main className="flex-1 px-8 md:px-10 lg:px-12 mx-auto w-full py-6 pb-24 md:pb-6">
+      <main className="flex-1 px-4 md:px-10 lg:px-12 mx-auto w-full py-6 pb-24 md:pb-6">
         {/* Mobile Filter Button */}
         <div className="md:hidden mb-4 flex items-center justify-between">
           <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
@@ -69,7 +83,7 @@ export default function SearchClient() {
                 variant="outline"
                 className="gap-2 bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:text-white"
               >
-                Детальный фильтр
+                {t("filterButton")}
                 <SlidersHorizontal className="h-4 w-4"/>
               </Button>
             </SheetTrigger>
@@ -97,7 +111,7 @@ export default function SearchClient() {
         {/* Results Count & View Toggle */}
         <div className="hidden md:flex items-center justify-between mb-6">
           <h1 className="text-lg md:text-xl font-semibold">
-            {totalResults} Объявление
+            {t("adsCount", { count: totalResults })}
           </h1>
           <div className="flex items-center gap-2  p-1">
             <button
@@ -145,7 +159,7 @@ export default function SearchClient() {
           <div className="flex-1">
             {!isLoading && !isFetching && !data?.results?.length &&
               <p className="text-center text-xl text-muted-foreground">
-                По вашему запросу товары не найдены
+                {t("notFound")}
               </p>}
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

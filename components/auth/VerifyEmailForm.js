@@ -1,10 +1,12 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl'; // Добавил импорт
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 export default function VerifyEmailForm() {
+  const t = useTranslations('VerifyEmail'); // Инициализация
   const router = useRouter();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef([]);
@@ -57,8 +59,6 @@ export default function VerifyEmailForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-
     console.log('Verification code:', code.join(''));
     // Add your verification logic here
   };
@@ -70,9 +70,9 @@ export default function VerifyEmailForm() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-center mb-3">Verify Your Email</h2>
+      <h2 className="text-2xl font-semibold text-center mb-3">{t('title')}</h2>
       <p className="text-center text-gray-600 text-sm mb-2">
-        We have sent code to your E-mail
+        {t('description')}
       </p>
       <p className="text-center text-[#FF6B2C] text-sm mb-8">
         damien.creation@yahoo.com
@@ -96,18 +96,18 @@ export default function VerifyEmailForm() {
         </div>
 
         <div className="text-center">
-          <span className="text-sm text-gray-600">Didn't receive code? </span>
+          <span className="text-sm text-gray-600">{t('resendText')} </span>
           <button
             type="button"
             onClick={handleResend}
             className="text-sm text-[#0F766E] hover:underline font-medium"
           >
-            Resend
+            {t('resendButton')}
           </button>
         </div>
 
         <Button disabled={code.some(item => !item)} type="submit" className="w-full">
-          Verify
+          {t('verifyButton')}
           <ArrowRight size={20} />
         </Button>
       </form>

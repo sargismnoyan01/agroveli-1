@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowRight } from "lucide-react"
+import { useTranslations } from "next-intl" // Добавил импорт
 
 import TextField from "@/components/shared/TextField"
 import PasswordField from "@/components/shared/PasswordField"
@@ -14,6 +15,7 @@ import { registerSchema } from "@/lib/validations/auth";
 import { useRegisterMutation } from "@/lib/store/services/authApi";
 
 export default function RegisterForm() {
+  const t = useTranslations("RegisterForm"); // Инициализация
   const router = useRouter();
   const [registerUser, { isLoading }] = useRegisterMutation();
 
@@ -45,32 +47,31 @@ export default function RegisterForm() {
     });
 
     if (res) {
-      // router.push(`/verify-email?email=${data.email}`)
       router.push(`/login`)
     }
   }
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-center mb-2">Register</h2>
+      <h2 className="text-2xl font-semibold text-center mb-2">{t("title")}</h2>
       <p className="text-center text-gray-600 text-sm mb-6">
-        Already have an Account?{" "}
+        {t("alreadyHaveAccount")}{" "}
         <Link href="/login" className="text-[#FF6B2C] hover:underline">
-          Log In
+          {t("logIn")}
         </Link>
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <TextField
-            label="First Name"
+            label={t("firstName")}
             placeholder="Damien"
             error={errors.firstName?.message}
             {...register("firstName")}
           />
 
           <TextField
-            label="Last Name"
+            label={t("lastName")}
             placeholder="Creation"
             error={errors.lastName?.message}
             {...register("lastName")}
@@ -79,7 +80,7 @@ export default function RegisterForm() {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <TextField
-            label="Email"
+            label={t("email")}
             type="email"
             placeholder="Email"
             error={errors.email?.message}
@@ -87,7 +88,7 @@ export default function RegisterForm() {
           />
 
           <PhoneField
-            label="Phone"
+            label={t("phone")}
             name={"phone"}
             error={errors.phone?.message}
             {...register("phone")}
@@ -99,14 +100,14 @@ export default function RegisterForm() {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <PasswordField
-            label="Create A Password"
+            label={t("createPassword")}
             placeholder="••••••••"
             error={errors.password?.message}
             {...register("password")}
           />
 
           <PasswordField
-            label="Confirm Password"
+            label={t("confirmPassword")}
             placeholder="••••••••"
             error={errors.confirmPassword?.message}
             {...register("confirmPassword")}
@@ -116,7 +117,7 @@ export default function RegisterForm() {
         <Button
           disabled={isLoading || isSubmitting}
           type="submit" className="w-full mt-6">
-          Register
+          {t("registerButton")}
           <ArrowRight size={20}/>
         </Button>
       </form>

@@ -3,14 +3,6 @@
 import { useState } from "react"
 import {
   LayoutGrid,
-  Carrot,
-  Apple,
-  Milk,
-  Wheat,
-  Sprout,
-  Wrench,
-  Tractor,
-  PawPrint,
   SlidersHorizontal,
   ListFilter,
   ChevronDown,
@@ -18,97 +10,188 @@ import {
   Trash2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { categories } from "@/lib/constants";
+import { categories } from "@/lib/constants"
+// ВАЖНО: используем наш роутер с поддержкой локалей
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
-
-const filters = [
-  { id: "price", label: "Цена" },
-  { id: "weight", label: "Вес" },
-  { id: "location", label: "Локация" },
-  { id: "type", label: "Тип" },
-  { id: "usage", label: "Порядок Использования" },
-]
-
-const priceRanges = [
-  { from: 1, to: 5 },
-  { from: 2, to: 6 },
-  { from: 3, to: 7 },
-  { from: 4, to: 8 },
-]
+const initialFilters = {
+  price_from: "",
+  price_to: "",
+  location: "",
+  type: "",
+  usageOrder: "",
+}
 
 export function CategoryFilters() {
-  const [activeFilters, setActiveFilters] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState("")
+  const t = useTranslations("Filters");
+  const [activeFilters, setActiveFilters] = useState(initialFilters);
+  const router = useRouter();
 
-  const toggleCategory = (categoryId) => {
-    setSelectedCategory(categoryId);
+  // Опции сортировки теперь получаем через ключи перевода
+  const usageOrderOptions = [
+    { value: "", label: t("sort.default") },
+    { value: "-created_at", label: t("sort.newest") },
+    { value: "created_at", label: t("sort.oldest") },
+    { value: "price_dram", label: t("sort.cheap_amd") },
+    { value: "-price_dram", label: t("sort.expensive_amd") },
+    { value: "price_lari", label: t("sort.cheap_gel") },
+    { value: "-price_lari", label: t("sort.expensive_gel") },
+  ]
+
+  const updateFilter = (key, value) => {
+    setActiveFilters((prev) => ({ ...prev, [key]: value }));
   }
 
   const handleReset = () => {
-    setSelectedCategory("")
-    setActiveFilters({})
+    setActiveFilters(initialFilters);
+  }
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    Object.entries(activeFilters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.append(key, value);
+      }
+    });
+
+    const queryString = params.toString();
+    // useRouter из i18n автоматически добавит /ru или /hy перед /search
+    router.push(queryString ? `/search?${queryString}` : "/search");
   }
 
   return (
-    <div className="bg-background ">
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="bg-card rounded-xl border border-border p-4 md:p-6 space-y-4 shadow-md">
-          {/* Categories */}
+
+          {/* Категории */}
           <div className="flex justify-between flex-wrap items-start gap-3 pb-3">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground shrink-0 pt-1.5">
-              <LayoutGrid className="h-4 w-4" />
-              <span>Категория</span>
+              <LayoutGrid className="h-4 w-4"/>
+              <span>{t("category_label")}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => {
                 const Icon = category.icon
-                const isSelected = category.id === selectedCategory
+                const isSelected = activeFilters.type === category.id
                 return (
                   <button
                     key={category.id}
-                    onClick={() => toggleCategory(category.id)}
+                    onClick={() => updateFilter("type", isSelected ? "" : category.id)}
                     className={cn(
                       "inline-flex rounded-md cursor-pointer items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors border",
                       isSelected
                         ? "bg-[#0F6A4F] text-white border-[#0F6A4F]"
-                        : "bg-background text-foreground border-[#0F6A4F] hover:bg-emerald-50 ",
+                        : "bg-background text-foreground border-[#0F6A4F] hover:bg-emerald-50",
                     )}
                   >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span>{category.label}</span>
+                    <Icon className="h-3.5 w-3.5"/>
+                    {/* Текст категорий лучше тоже переводить через t(`categories.${category.id}`) */}
+                    <span>{t(`categories.${category.id}`)}</span>
                   </button>
                 )
               })}
             </div>
           </div>
 
-          {/* Filters */}
-          <div className="flex justify-between flex-wrap items-center gap-3  border-t border-border pt-3 pb-3">
+          {/* Фильтры */}
+          <div className="flex justify-between flex-wrap items-center gap-3 border-t border-border pt-3 pb-3">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground shrink-0">
-              <SlidersHorizontal className="h-4 w-4" />
-              <span>Фильтры</span>
+              <SlidersHorizontal className="h-4 w-4"/>
+              <span>{t("filters_label")}</span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex flex-wrap gap-2">
-                {filters.map((filter) => (
-                  <FilterDropdown
-                    key={filter.id}
-                    filter={filter}
-                    value={activeFilters[filter.id]}
-                    onChange={(value) => setActiveFilters((prev) => ({ ...prev, [filter.id]: value }))}
+
+              {/* Цена */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline"
+                          className="h-9 rounded-lg gap-1 text-sm font-normal border-border bg-transparent">
+                    {activeFilters.price_from || activeFilters.price_to
+                      ? `${t("price")}: ${activeFilters.price_from || 0} - ${activeFilters.price_to || '...'}`
+                      : t("price")}
+                    <ChevronDown className="h-3.5 w-3.5"/>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="p-3 w-64">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder={t("from")}
+                      type="number"
+                      value={activeFilters.price_from}
+                      onChange={(e) => updateFilter("price_from", e.target.value)}
+                      className="h-9"
+                    />
+                    <span>-</span>
+                    <Input
+                      placeholder={t("to")}
+                      type="number"
+                      value={activeFilters.price_to}
+                      onChange={(e) => updateFilter("price_to", e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Локация */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline"
+                          className="h-9 rounded-lg gap-1 text-sm font-normal border-border bg-transparent">
+                    {activeFilters.location || t("location")}
+                    <ChevronDown className="h-3.5 w-3.5"/>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="p-3 w-64">
+                  <Input
+                    placeholder={t("enter_city")}
+                    value={activeFilters.location}
+                    onChange={(e) => updateFilter("location", e.target.value)}
+                    className="h-9"
                   />
-                ))}
-              </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Сортировка */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline"
+                          className="h-9 rounded-lg gap-1 text-sm font-normal border-border bg-transparent">
+                    {usageOrderOptions.find(o => o.value === activeFilters.usageOrder)?.label || t("sort_label")}
+                    <ChevronDown className="h-3.5 w-3.5"/>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {usageOrderOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => updateFilter("usageOrder", option.value)}
+                      className={cn(activeFilters.usageOrder === option.value && "bg-emerald-50 text-emerald-700")}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
             </div>
           </div>
 
-          {/* Results Actions */}
+          {/* Результаты */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <ListFilter className="h-4 w-4" />
-              <span>Результаты</span>
+              <ListFilter className="h-4 w-4"/>
+              <span>{t("results")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -116,73 +199,20 @@ export function CategoryFilters() {
                 onClick={handleReset}
                 className="rounded-lg h-10 border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600 gap-2 bg-transparent"
               >
-                Сбросить
-                <Trash2 className="h-4 w-4" />
+                {t("reset")}
+                <Trash2 className="h-4 w-4"/>
               </Button>
-              <Button className="rounded-lg h-10 bg-[#0F6A4F] text-white gap-2">
-                Поиск
-                <Search className="h-4 w-4" />
+              <Button
+                onClick={handleSearch}
+                className="rounded-lg h-10 bg-[#0F6A4F] text-white gap-2 hover:bg-[#0D5A43]"
+              >
+                {t("search_btn")}
+                <Search className="h-4 w-4"/>
               </Button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
-
-function FilterDropdown({
-                          filter,
-                          value,
-                          onChange,
-                        }) {
-  if (filter.id === "price") {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-9 rounded-lg gap-1 text-sm font-normal border-border bg-transparent">
-            {filter.label}
-            <ChevronDown className="h-3.5 w-3.5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48 p-3">
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="text-center font-medium border rounded px-2 py-1">От</div>
-              <div className="text-center font-medium border rounded px-2 py-1">До</div>
-            </div>
-            {priceRanges.map((range, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-2 gap-2 text-sm cursor-pointer hover:bg-muted rounded"
-                onClick={() => onChange(`${range.from}-${range.to}`)}
-              >
-                <div className="text-center py-1">{range.from}</div>
-                <div className="text-center py-1">{range.to}</div>
-              </div>
-            ))}
-            <Button size="sm" className="w-full bg-[#0F6A4F]  text-white">
-              Выбирать
-            </Button>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="h-9 rounded-lg gap-1 text-sm font-normal border-border bg-transparent">
-          {filter.label}
-          <ChevronDown className="h-3.5 w-3.5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuItem onClick={() => onChange("option1")}>Опция 1</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onChange("option2")}>Опция 2</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onChange("option3")}>Опция 3</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }

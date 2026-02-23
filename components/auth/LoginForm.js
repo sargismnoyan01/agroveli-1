@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl'; // Добавлен импорт
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -15,6 +16,7 @@ import { loginSchema } from "@/lib/validations/auth";
 import { useLoginMutation } from "@/lib/store/services/authApi";
 
 export default function LoginForm() {
+  const t = useTranslations('LoginForm'); // Инициализация
   const router = useRouter();
   const [login, {isLoading}] = useLoginMutation();
 
@@ -42,17 +44,16 @@ export default function LoginForm() {
     if(res){
       router.push('/')
     }
-
   };
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-center mb-2">Log In</h2>
+      <h2 className="text-2xl font-semibold text-center mb-2">{t('title')}</h2>
 
       <p className="text-center text-gray-600 text-sm mb-6">
-        Need a Agroveli account?{' '}
+        {t('needAccount')}{' '}
         <Link href="/register" className="text-[#FF6B2C] hover:underline">
-          Create an Account
+          {t('createAccount')}
         </Link>
       </p>
 
@@ -64,17 +65,17 @@ export default function LoginForm() {
       >
         {/* Email */}
         <TextField
-          label="Email"
+          label={t('emailLabel')}
           type="email"
           className="mb-4"
-          placeholder="Email"
+          placeholder={t('emailPlaceholder')}
           {...register('email')}
           error={errors.email?.message}
         />
 
         {/* Password */}
         <PasswordField
-          label="Password"
+          label={t('passwordLabel')}
           placeholder="••••••••••"
           {...register('password')}
           error={errors.password?.message}
@@ -94,7 +95,7 @@ export default function LoginForm() {
               htmlFor="keepLoggedIn"
               className="text-sm text-gray-700 cursor-pointer"
             >
-              Keep me logged in
+              {t('keepLoggedIn')}
             </label>
           </div>
 
@@ -102,7 +103,7 @@ export default function LoginForm() {
             href="/forgot-password"
             className="text-sm text-[#FF6B2C] hover:underline"
           >
-            Forget password?
+            {t('forgotPassword')}
           </Link>
         </div>
 
@@ -111,7 +112,7 @@ export default function LoginForm() {
           type="submit"
           className="w-full mt-6"
         >
-          Log in
+          {t('loginButton')}
           <ArrowRight size={20} />
         </Button>
       </form>

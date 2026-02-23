@@ -11,33 +11,37 @@ import {
   useGetVipProductsQuery
 } from "@/lib/store/services/productApi";
 import { Crown, Sparkles, Zap } from "lucide-react";
-
-
-const adBanners = [
-  {
-    id: 1,
-    image: "/assets/images/ad.png",
-  },
-  {
-    id: 2,
-    image: "/assets/images/mandarin.png",
-  },
-  {
-    id: 3,
-    image: "/assets/images/ad.png",
-  },
-]
+import { FullScreenLoader } from "@/components/shared/FullScreenLoader";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function HomePage() {
-  const {data: premiumPlusProducts} = useGetPremiumPlusProductsQuery({limit: 10});
-  const {data: premiumProducts} = useGetPremiumProductsQuery({limit: 10});
-  const {data: vipProducts} = useGetVipProductsQuery({limit: 10});
-  const {data: adsData} = useGetAdsQuery();
+  const {data: premiumPlusProducts, isLoading: isLoading1} = useGetPremiumPlusProductsQuery({limit: 10});
+  const {data: premiumProducts, isLoading: isLoading2} = useGetPremiumProductsQuery({limit: 10});
+  const {data: vipProducts, isLoading: isLoading3} = useGetVipProductsQuery({limit: 10});
+  const {data: adsData, isLoading: isLoading4} = useGetAdsQuery();
+  const hasData = premiumPlusProducts || premiumProducts || vipProducts || adsData;
+  const isFetching = isLoading1 || isLoading2 || isLoading3 || isLoading4;
+  const t = useTranslations('HomePage');
+  const [showLoader, setShowLoader] = useState(!hasData);
 
-  console.log(adsData, 'ads')
+  useEffect(() => {
+    let timeoutId;
+
+    if (isFetching) {
+      setShowLoader(true);
+    } else if (hasData) {
+      timeoutId = setTimeout(() => {
+        setShowLoader(false);
+      }, 1200);
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [isFetching, hasData]);
 
   return (
     <div className="min-h-screen bg-background">
+      {showLoader && <FullScreenLoader />}
       <HeroBanner />
       <main className="pb-20 md:pb-0">
         <CategoryFilters />
@@ -71,7 +75,6 @@ export default function HomePage() {
           />}
 
           <AdBanner banners={adsData?.filter(ad => ad.status === 'VIP') || []} />
-
 
         </div>
       </main>

@@ -1,10 +1,14 @@
-import './globals.css';
+import "../globals.css";
 import 'react-phone-number-input/style.css'
 import 'swiper/css';
 import "swiper/css/pagination";
-
+import { Noto_Sans_Armenian, Noto_Sans_Georgian, Roboto } from 'next/font/google';
+import Providers from "@/components/shared/Providers";
+import { getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 
 export const metadata = {
+  metadataBase: new URL('http://localhost:3000'),
   title: "AgroVeli — Сельхозтовары",
   description:
     "AgroVeli — платформа для поиска и размещения сельхозтоваров. Найдите агро-товары и свяжитесь с продавцом напрямую.",
@@ -12,11 +16,11 @@ export const metadata = {
   icons: {
     icon: [
       {
-        url: "/assets/images/bg1.png",
+        url: "/assets/images/favicon.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/assets/images/bg1.png",
+        url: "/assets/images/favicon.png",
         media: "(prefers-color-scheme: dark)",
       },
       // {
@@ -24,7 +28,7 @@ export const metadata = {
       //   type: "image/svg+xml",
       // },
     ],
-    apple: "/assets/images/bg1.png",
+    apple: "/assets/images/favicon.png",
   },
 
   openGraph: {
@@ -52,23 +56,39 @@ export const metadata = {
   },
 };
 
-import { Roboto } from 'next/font/google';
-import Providers from "@/components/shared/Providers";
-
 const roboto = Roboto({
-  subsets: ['latin'],
+  subsets: ['latin', 'cyrillic'],
   weight: ['400', '500', '700'],
   variable: '--font-sans',
 });
 
+const armenian = Noto_Sans_Armenian({
+  subsets: ['armenian'],
+  variable: '--font-armenian',
+});
 
-export default function RootLayout({ children }) {
+const georgian = Noto_Sans_Georgian({
+  subsets: ['georgian'],
+  variable: '--font-georgian',
+});
+
+export function generateStaticParams() {
+  return [{locale: 'ru'}, {locale: 'hy'}, {locale: 'ka'}];
+}
+
+export default async function RootLayout({ children, params }) {
+  const { locale } = await params;
+
+  const messages = await getMessages({ locale });
+
   return (
-    <html lang="en">
-    <body className={roboto.variable}>
-    <Providers >
-      {children}
-    </Providers>
+    <html lang={locale}>
+    <body className={`${roboto.variable} ${armenian.variable} ${georgian.variable} font-sans`}>
+    <NextIntlClientProvider messages={messages} locale={locale}>
+      <Providers>
+        {children}
+      </Providers>
+    </NextIntlClientProvider>
     </body>
     </html>
   );
