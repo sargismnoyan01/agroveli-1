@@ -42,7 +42,7 @@ export default function ForgotPasswordForm() {
       }
 
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -89,17 +89,6 @@ export default function ForgotPasswordForm() {
           <ArrowRight size={20} className="ml-2" />
         </Button>
       </form>
-
-      <p className="text-center text-gray-600 text-sm mt-6">
-        {t('didNotReceiveEmail')}{' '}
-        <button
-          type="button"
-          onClick={handleSubmit(onSubmit)}
-          className="text-[#FF6B2C] hover:underline font-medium"
-        >
-          {t('resend')}
-        </button>
-      </p>
     </div>
   );
 }

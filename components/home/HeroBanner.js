@@ -8,7 +8,7 @@ export function HeroBanner() {
   const t = useTranslations("Hero"); // Инициализируем перевод
 
   return (
-    <section className="relative h-[500px] overflow-hidden bg-transparent md:block">
+    <section className="hidden relative h-[500px] overflow-hidden bg-transparent md:block">
       <Image
         src="/assets/images/bg1.png"
         alt="background"

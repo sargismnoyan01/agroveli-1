@@ -102,7 +102,7 @@ export default function EditProfilePage() {
         router.push("/profile")
       }
     } catch (err) {
-      console.error("Failed to update profile:", err)
+      console.log("Failed to update profile:", err)
     }
   }
 

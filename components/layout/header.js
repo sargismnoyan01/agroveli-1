@@ -11,13 +11,15 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useGetProfileQuery } from "@/lib/store/services/authApi";
+import { authApi, useGetProfileQuery } from "@/lib/store/services/authApi";
 import Logo from "@/components/shared/Logo";
 import Cookies from "js-cookie";
 import HeaderSearch from "@/components/layout/Search";
 
 import { useLocale, useTranslations } from "next-intl"; // Добавил useTranslations
 import { Link, useRouter, usePathname } from "@/i18n/navigation";
+import { useDispatch } from "react-redux";
+import { productApi } from "@/lib/store/services/productApi";
 
 const languages = [
   { code: "ru", name: "Русский", flag: "🇷🇺" },
@@ -35,6 +37,7 @@ export function Header() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch();
 
   const currentLanguage = languages.find(l => l.code === locale) || languages[0];
 
@@ -55,11 +58,15 @@ export function Header() {
   const handleLanguageChange = (newLocale) => {
     Cookies.set('NEXT_LOCALE', newLocale, { expires: 365 });
     router.replace(pathname, { locale: newLocale });
+    dispatch(authApi.util.resetApiState());
+    dispatch(productApi.util.resetApiState());
   };
 
   const handleCurrencyChange = (currency) => {
     setSelectedCurrency(currency);
     Cookies.set('selected_currency', currency.code, { expires: 365 });
+    dispatch(authApi.util.resetApiState());
+    dispatch(productApi.util.resetApiState());
   };
 
   return (

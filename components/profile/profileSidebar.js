@@ -16,14 +16,18 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useGetProfileQuery } from "@/lib/store/services/authApi";
-import { useTranslations } from "next-intl"; // Добавил импорт
+import {  useTranslations } from "next-intl"; // Добавил импорт
 import ProfileSkeleton from "@/components/shared/ProfileSkeleton";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { productApi } from "@/lib/store/services/productApi";
 
 export function ProfileSidebar() {
   const t = useTranslations("ProfileSidebar"); // Инициализация
   const pathname = usePathname();
   const { data: userData, isLoading } = useGetProfileQuery();
+  const dispatch = useDispatch();
+  const locale = "ru";
 
   // Перенес navLinks внутрь компонента, чтобы использовать t()
   const navLinks = [
@@ -37,7 +41,13 @@ export function ProfileSidebar() {
       label: t("favorites"),
       icon: Heart,
     },
-  ]
+  ];
+
+  const checkActive = (href) => {
+    if (pathname === href) return true;
+    if (pathname === `/${locale}${href}`) return true;
+    return false;
+  };
 
   if (isLoading) {
     return <ProfileSkeleton/>
@@ -56,10 +66,11 @@ export function ProfileSidebar() {
                 alt={userData.info?.first_name + ' ' + userData.info?.last_name}
                 width={64}
                 height={64}
-                className="rounded-full object-cover w-16 h-16"
+                className="rounded-full object-cover w-16 h-16 min-w-[64px]"
               />
-              <div>
-                <h2 className="font-semibold text-lg text-foreground">{userData.info?.first_name + " " + userData.info?.last_name}</h2>
+              <div className="truncate">
+                <h2
+                  className="font-semibold text-lg text-foreground ">{userData.info?.first_name + " " + userData.info?.last_name}</h2>
                 <Link href={'/edit-profile'}
                       className="flex items-center gap-1.5 text-sm text-[#FF6400] mt-0.5 no-underline">
                   <Pencil className="h-3.5 w-3.5"/>
@@ -99,10 +110,11 @@ export function ProfileSidebar() {
                 <span>{t("addListing")}</span>
               </Link>
               <button
-                onClick={()=> {
+                onClick={() => {
                   Cookies.remove('accessToken');
                   Cookies.remove('refreshToken');
-
+                  dispatch(authApi.util.resetApiState());
+                  dispatch(productApi.util.resetApiState());
                   window.location.href = '/login'
                 }}
                 className="flex items-center gap-3 text-sm text-red-500 hover:text-red-600 transition-colors bg-transparent border-0 cursor-pointer">
@@ -116,7 +128,7 @@ export function ProfileSidebar() {
             <nav className=" space-y-1">
               {navLinks.map((link) => {
                 const Icon = link.icon
-                const isActive = pathname === link.href
+                const isActive = checkActive(link.href);
                 return (
                   <Link
                     key={link.href}
@@ -150,8 +162,9 @@ export function ProfileSidebar() {
               height={56}
               className="rounded-full object-cover w-14 h-14"
             />
-            <div>
-              <h2 className="font-semibold text-foreground">{userData.info?.first_name + " " + userData.info?.last_name}</h2>
+            <div className="">
+              <h2
+                className="font-semibold text-foreground break-all">{userData.info?.first_name + " " + userData.info?.last_name}</h2>
               <Link href={'/edit-profile'} className="flex items-center gap-1.5 text-sm text-[#FF6400]  mt-0.5">
                 <Pencil className="h-3.5 w-3.5"/>
                 <span>{t("editProfile")}</span>
@@ -190,7 +203,7 @@ export function ProfileSidebar() {
               <span>{t("addListing")}</span>
             </Link>
             <button
-              onClick={()=> {
+              onClick={() => {
                 Cookies.remove('accessToken');
                 Cookies.remove('refreshToken');
 
@@ -207,7 +220,7 @@ export function ProfileSidebar() {
             <div className="flex">
               {navLinks.map((link) => {
                 const Icon = link.icon
-                const isActive = pathname === link.href
+                const isActive = checkActive(link.href);
                 return (
                   <Link
                     key={link.href}

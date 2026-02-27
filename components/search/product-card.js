@@ -10,12 +10,14 @@ import { Autoplay, Pagination } from "swiper/modules";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useLikeProductMutation } from "@/lib/store/services/productApi";
-import { useTranslations } from "next-intl"; // Импорт
+import { useTranslations } from "next-intl";
+import Cookies from "js-cookie"; // Импорт
 
 export function ProductCard({ product, viewMode }) {
   const t = useTranslations("ProductCard"); // Инициализация
   const [like, { isLoading }] = useLikeProductMutation();
   const [isLiked, setIsLiked] = useState(product.is_liked);
+  const currency = Cookies.get('selected_currency');
 
   const handleToggleFavorite = async (productId) => {
     await like({ id: productId });
@@ -29,6 +31,7 @@ export function ProductCard({ product, viewMode }) {
       isLoading={isLoading}
       isLiked={isLiked}
       t={t} // Пробрасываем перевод
+      currency={currency}
     />
   }
   return <ListProductCard
@@ -37,6 +40,7 @@ export function ProductCard({ product, viewMode }) {
     isLoading={isLoading}
     isLiked={isLiked}
     t={t} // Пробрасываем перевод
+    currency={currency}
   />
 }
 
@@ -45,7 +49,8 @@ function GridProductCard({
                            onToggleFavorite,
                            isLoading,
                            isLiked,
-                           t // Получаем t
+                           t,
+                           currency
                          }) {
   return (
     <Link href={`/product/${product.id}`}
@@ -77,7 +82,10 @@ function GridProductCard({
         </div>
 
         <div className="flex items-center justify-between mt-2">
-          <span className="text-lg font-bold text-black">{product.price_lari}₾</span>
+          <span className="text-lg font-bold text-black">
+            {currency === "AMD" ? product.price_dram : product.price_lari}
+            {currency === "AMD" ? "֏" : "₾"}
+          </span>
           {product.unit && (
             <span className="text-sm text-muted-foreground">{product.unit_of_measurement}</span>
           )}
@@ -129,14 +137,16 @@ function ListProductCard({
                            onToggleFavorite,
                            isLoading,
                            isLiked,
-                           t // Получаем t
+                           t,
+                           currency
                          }) {
   return (
     <Link href={`/product/${product.id}`}
           className="group bg-card overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.12)] p-2 rounded-xl no-underline">
       <div className="flex flex-col sm:flex-row">
         {/* Image section remains the same */}
-        <div className="max-h-[260px] relative w-full sm:w-48 md:w-56 lg:w-64 shrink-0 aspect-[4/3] sm:aspect-auto sm:h-auto bg-muted overflow-hidden rounded-lg">
+        <div
+          className="max-h-[260px] relative w-full sm:w-48 md:w-56 lg:w-64 shrink-0 aspect-[4/3] sm:aspect-auto sm:h-auto bg-muted overflow-hidden rounded-lg">
           <Swiper
             slidesPerView={1}
             pagination={{ clickable: true }}
@@ -164,7 +174,10 @@ function ListProductCard({
 
             <div className="mt-3 w-full flex justify-between gap-2">
               <div>
-                <span className="text-xl font-bold text-black">{product.price_lari}₾</span>
+                <span className="text-xl font-bold text-black">
+                    {currency === "AMD" ? product.price_dram : product.price_lari}
+                  {currency === "AMD" ? "֏" : "₾"}
+                </span>
                 {product.unit && (
                   <span className="text-sm text-muted-foreground ml-1">/ {product.unit_of_measurement}</span>
                 )}

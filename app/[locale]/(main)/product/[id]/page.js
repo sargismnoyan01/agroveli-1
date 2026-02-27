@@ -16,7 +16,7 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronLeft,
-  ChevronRight,
+  ChevronRight, Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -24,6 +24,8 @@ import { useParams } from "next/navigation";
 import { useGetProductQuery } from "@/lib/store/services/productApi";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { ProductDetailsSkeleton } from "@/components/shared/ProductDetailsSkeleton";
+import Cookies from "js-cookie";
+import { ProductCarousel } from "@/components/home/ProductCarusel";
 
 export default function ProductPage() {
   const t = useTranslations("ProductPage"); // Инициализация
@@ -34,6 +36,7 @@ export default function ProductPage() {
   const mainSwiperRef = useRef(null);
   const {id} = useParams();
   const {data, isLoading, isFetching} = useGetProductQuery({id});
+  const currency = Cookies.get('selected_currency');
 
   const handleCopyArticle = () => {
     if (data?.article) {
@@ -194,9 +197,11 @@ export default function ProductPage() {
           <div className="bg-background rounded-xl p-6 h-fit">
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-5xl text-brand">{Number(data.price_lari)}</span>
+                <span className="font-bold text-5xl text-brand">
+                    {currency === "AMD" ? Number(data.price_dram) : Number(data.price_lari)}
+                  </span>
                 <div className="flex items-center gap-1">
-                  <span className="w-6 h-6 rounded-full bg-muted flex items-center text-2xl justify-center text-xs font-medium text-brand">₾</span>
+                  <span className="w-6 h-6 rounded-full bg-muted flex items-center text-2xl justify-center text-xs font-medium text-brand">{currency === "AMD" ? "֏" : "₾"}</span>
                 </div>
                 <span className="text-muted-foreground">/{data.unit_of_measurement}</span>
               </div>
@@ -283,9 +288,13 @@ export default function ProductPage() {
           <div className="bg-background rounded-xl p-4">
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-3xl font-bold text-emerald-600">{data.price_lari}</span>
+                <span className="text-3xl font-bold text-emerald-600">
+                  {currency === "AMD" ? Number(data.price_dram) : Number(data.price_lari)}
+                </span>
                 <div className="flex items-center gap-1">
-                  <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">₾</span>
+                  <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+                    {currency === "AMD" ? "֏" : "₾"}
+                  </span>
                 </div>
                 <span className="text-muted-foreground text-sm">
                   /{data.unit_of_measurement} ({t("max")} {data.count} кг)
@@ -355,12 +364,18 @@ export default function ProductPage() {
         </div>
 
         {/* Desktop Description */}
-        <div className="hidden md:block mt-6">
+        <div className="hidden md:block mt-6 mb-8 md:shadow-[0_0_20px_rgba(0,0,0,0.12)] rounded-xl">
           <div className="bg-background rounded-xl p-6">
             <h2 className="font-bold text-lg text-foreground mb-3">{t("description")}</h2>
             <p className="text-muted-foreground leading-relaxed">{data.detail.description}</p>
           </div>
         </div>
+
+        <ProductCarousel
+          title={t("RelatedAds")}
+          products={data.suggestion_products || []}
+          badgeColor="bg-[#0F6A4F]"
+        />
       </main>
 
       {copied && (

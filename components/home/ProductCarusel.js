@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight, Heart} from "lucide-react"
+import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -10,38 +10,37 @@ import Image from "next/image";
 // Используем локализованный Link
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import Cookies from "js-cookie";
+import { useLikeProductMutation } from "@/lib/store/services/productApi";
 
 export function ProductCarousel({ title, products, badgeColor, BadgeIcon, path }) {
   const t = useTranslations("ProductCard");
-  const [favorites, setFavorites] = useState(products?.filter((p) => p.favorite).map((p) => p.id))
-
-  const toggleFavorite = (productId) => {
-    setFavorites((prev) => (prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]))
-  }
 
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between mb-8">
         <Link
-          href={`/${path}`}
+          href={path ? `/${path}`: ''}
           className={cn(
             "inline-flex h-12 items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium no-underline",
             badgeColor,
           )}
         >
-          <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", badgeColor)}>
+          {BadgeIcon && <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", badgeColor)}>
             <BadgeIcon className="h-5 w-5 text-white"/>
-          </div>
+          </div>}
           {/* title теперь должен передаваться уже переведенным или переводиться здесь */}
           <span>{title}</span>
         </Link>
         {/* ... стрелки навигации без изменений ... */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" className="swiper-button-prev-custom h-8 w-8 rounded-full border-border bg-transparent">
-            <ChevronLeft className="h-4 w-4" />
+          <Button variant="outline" size="icon"
+                  className="swiper-button-prev-custom h-8 w-8 rounded-full border-border bg-transparent">
+            <ChevronLeft className="h-4 w-4"/>
           </Button>
-          <Button variant="outline" size="icon" className="swiper-button-next-custom h-8 w-8 rounded-full border-border bg-transparent">
-            <ChevronRight className="h-4 w-4" />
+          <Button variant="outline" size="icon"
+                  className="swiper-button-next-custom h-8 w-8 rounded-full border-border bg-transparent">
+            <ChevronRight className="h-4 w-4"/>
           </Button>
         </div>
       </div>
@@ -64,11 +63,6 @@ export function ProductCarousel({ title, products, badgeColor, BadgeIcon, path }
           <SwiperSlide key={product.id}>
             <ProductCard
               product={product}
-              isFavorite={favorites.includes(product.id)}
-              onToggleFavorite={(e) =>{
-                e.preventDefault();
-                toggleFavorite(product.id)
-              }}
             />
           </SwiperSlide>
         ))}
@@ -77,9 +71,17 @@ export function ProductCarousel({ title, products, badgeColor, BadgeIcon, path }
   )
 }
 
-function ProductCard({ product, isFavorite, onToggleFavorite }) {
+function ProductCard({ product, }) {
   const t = useTranslations("ProductCard");
   const [visited, setVisited] = useState(false);
+  const [like, { isLoading }] = useLikeProductMutation();
+  const currency = Cookies.get('selected_currency');
+  const [isLiked, setIsLiked] = useState(product.is_liked);
+
+  const handleToggleFavorite = async (productId) => {
+    await like({ id: productId });
+    setIsLiked(!isLiked);
+  }
 
   useEffect(() => {
     const visitedProducts = JSON.parse(localStorage.getItem("visitedProducts") || "[]");
@@ -96,7 +98,8 @@ function ProductCard({ product, isFavorite, onToggleFavorite }) {
   };
 
   return (
-    <Link href={`/product/${product.id}`} onClick={handleClick} className="block decoration-0 flex-shrink-0 w-full snap-start rounded-xl shadow-lg hover:shadow transition mb-8">
+    <Link href={`/product/${product.id}`} onClick={handleClick}
+          className="block decoration-0 flex-shrink-0 w-full snap-start rounded-xl shadow-lg hover:shadow transition mb-8 no-underline">
       <div className="relative group">
         <div className="relative rounded-xl overflow-hidden bg-muted h-[200px]">
           <Swiper
@@ -108,7 +111,8 @@ function ProductCard({ product, isFavorite, onToggleFavorite }) {
           >
             {product.images?.map((image, i) => (
               <SwiperSlide key={i}>
-                <Image src={image.image || "/placeholder.svg"} width={313} height={200} alt={product.name} className="w-full h-full object-cover" />
+                <Image src={image.image || "/placeholder.svg"} width={313} height={200} alt={product.name}
+                       className="w-full h-full object-cover"/>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -126,14 +130,22 @@ function ProductCard({ product, isFavorite, onToggleFavorite }) {
               <p className="text-sm text-muted-foreground">{product.location}</p>
               <h3 className="text-base text-[#0F6A4F] truncate font-bold">{product.name}</h3>
             </div>
-            <button onClick={onToggleFavorite} className="shrink-0 p-1 border-none bg-transparent cursor-pointer">
-              <Heart className={cn("h-5 w-5 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-muted-foreground hover:text-rose-500")} />
+            <button disabled={isLoading}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleFavorite(product.id)
+                    }}
+                    className="shrink-0 p-1 border-none bg-transparent cursor-pointer">
+              <Heart
+                className={cn("h-5 w-5 transition-colors", isLiked ? "fill-rose-500 text-rose-500" : "text-muted-foreground hover:text-rose-500")}/>
             </button>
           </div>
           <div className="flex items-baseline justify-between mt-1">
             {/* Валюта зависит от бекенда, но тут можно подставить нужный символ */}
             <span className="text-lg font-bold text-foreground">
-              {product.price_lari}₾
+                 {currency === "AMD" ? product.price_dram : product.price_lari}
+              {currency === "AMD" ? "֏" : "₾"}
             </span>
             {product.unit_of_measurement && (
               <span className="text-sm text-muted-foreground">

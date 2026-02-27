@@ -4,6 +4,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl'; // Добавил импорт
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useForgotPasswordMutation, useVerifyEmailMutation } from "@/lib/store/services/authApi";
+import { toast } from "react-toastify";
 
 export default function VerifyEmailForm() {
   const t = useTranslations('VerifyEmail'); // Инициализация
@@ -12,12 +14,18 @@ export default function VerifyEmailForm() {
   const inputRefs = useRef([]);
   const searchParams = useSearchParams()
   const email = searchParams.get('email');
+  const uid = searchParams.get('uid');
+  const token = searchParams.get('token');
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const [verfy, { isLoading: isVerfyLoading }] = useVerifyEmailMutation();
+
 
   useEffect(() => {
-    if(!email){
+    if (!email || !uid || !token) {
       router.push('/login');
+      toast.error(t('Errors.somethingWentWrong'));
     }
-  }, [email]);
+  }, [email, uid, token]);
 
   useEffect(() => {
     // Focus first input on mount
@@ -65,14 +73,20 @@ export default function VerifyEmailForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Verification code:', code.join(''));
+
+    verfy({
+      uid,
+      token,
+    })
 
     // Add your verification logic here
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
+    await forgotPassword({ email })
     console.log('Resending code...');
     // Add resend logic here
   };
@@ -107,17 +121,18 @@ export default function VerifyEmailForm() {
         <div className="text-center my-4">
           <span className="text-sm text-gray-600">{t('resendText')} </span>
           <button
+            disabled={isLoading}
             type="button"
             onClick={handleResend}
-            className="text-sm text-[#0F766E] hover:underline font-medium"
+            className="text-sm text-[#0F766E] hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('resendButton')}
           </button>
         </div>
 
-        <Button disabled={code.some(item => !item)} type="submit" className="w-full">
+        <Button disabled={isLoading || code.some(item => !item)} type="submit" className="w-full">
           {t('verifyButton')}
-          <ArrowRight size={20} />
+          <ArrowRight size={20}/>
         </Button>
       </form>
     </div>
