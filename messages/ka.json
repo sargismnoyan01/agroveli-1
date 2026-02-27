@@ -256,6 +256,16 @@
     "filterButton": "დეტალური ფილტრი",
     "adsCount": "{count, plural, one {# განცხადება} other {# განცხადება}}",
     "notFound": "თქვენი მოთხოვნის შესაბამისი განცხადებები ვერ მოიძებნა"
+  },
+  "ForgotPasswordForm": {
+    "title": "დაგავიწყდათ პაროლი?",
+    "description": "მიუთითეთ თქვენი ელ-ფოსტა და ჩვენ გამოგიგზავნით პაროლის აღდგენის ბმულს.",
+    "emailLabel": "ელ-ფოსტის მისამართი",
+    "emailPlaceholder": "example@gmail.com",
+    "submitButton": "ბმულის გაგზავნა",
+    "backToLogin": "ავტორიზაციაზე დაბრუნება",
+    "didNotReceiveEmail": "არ მიგიღიათ წერილი?",
+    "resend": "ხელახლა გაგზავნა"
   }
 
 }

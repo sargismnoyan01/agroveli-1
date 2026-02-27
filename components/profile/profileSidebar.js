@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { useGetProfileQuery } from "@/lib/store/services/authApi";
 import { useTranslations } from "next-intl"; // Добавил импорт
 import ProfileSkeleton from "@/components/shared/ProfileSkeleton";
+import Cookies from "js-cookie";
 
 export function ProfileSidebar() {
   const t = useTranslations("ProfileSidebar"); // Инициализация
@@ -97,7 +98,14 @@ export function ProfileSidebar() {
                 <PlusCircle className="h-4 w-4"/>
                 <span>{t("addListing")}</span>
               </Link>
-              <button className="flex items-center gap-3 text-sm text-red-500 hover:text-red-600 transition-colors bg-transparent border-0 cursor-pointer">
+              <button
+                onClick={()=> {
+                  Cookies.remove('accessToken');
+                  Cookies.remove('refreshToken');
+
+                  window.location.href = '/login'
+                }}
+                className="flex items-center gap-3 text-sm text-red-500 hover:text-red-600 transition-colors bg-transparent border-0 cursor-pointer">
                 <LogOut className="h-4 w-4"/>
                 <span>{t("logout")}</span>
               </button>
@@ -181,7 +189,14 @@ export function ProfileSidebar() {
               <PlusCircle className="h-4 w-4"/>
               <span>{t("addListing")}</span>
             </Link>
-            <button className="flex items-center gap-3 text-sm text-red-500 hover:text-red-600 transition-colors bg-transparent border-0 cursor-pointer">
+            <button
+              onClick={()=> {
+                Cookies.remove('accessToken');
+                Cookies.remove('refreshToken');
+
+                window.location.href = '/login'
+              }}
+              className="flex items-center gap-3 text-sm text-red-500 hover:text-red-600 transition-colors bg-transparent border-0 cursor-pointer">
               <LogOut className="h-4 w-4"/>
               <span>{t("logout")}</span>
             </button>

@@ -252,6 +252,16 @@
     "filterButton": "Մանրամասն զտում",
     "adsCount": "{count, plural, one {# Հայտարարություն} other {# Հայտարարություն}}",
     "notFound": "Ձեր հարցմանը համապատասխան ապրանք չի գտնվել"
+  },
+  "ForgotPasswordForm": {
+    "title": "Մոռացե՞լ եք գաղտնաբառը",
+    "description": "Մուտքագրեք Ձեր էլ. փոստի հասցեն, և մենք կուղարկենք գաղտնաբառը վերականգնելու հղումը:",
+    "emailLabel": "Էլ. փոստի հասցե",
+    "emailPlaceholder": "example@gmail.com",
+    "submitButton": "Ուղարկել հղումը",
+    "backToLogin": "Վերադառնալ մուտքի էջ",
+    "didNotReceiveEmail": "Չե՞ք ստացել նամակը",
+    "resend": "Ուղարկել կրկին"
   }
 
 }

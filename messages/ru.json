@@ -256,5 +256,15 @@
     "filterButton": "Детальный фильтр",
     "adsCount": "{count, plural, one {# Объявление} few {# Объявления} other {# Объявлений}}",
     "notFound": "По вашему запросу товары не найдены"
+  },
+  "ForgotPasswordForm": {
+    "title": "Забыли пароль?",
+    "description": "Введите ваш адрес электронной почты, и мы отправим вам ссылку для восстановления пароля.",
+    "emailLabel": "Электронная почта",
+    "emailPlaceholder": "example@gmail.com",
+    "submitButton": "Отправить ссылку",
+    "backToLogin": "Вернуться к входу",
+    "didNotReceiveEmail": "Не получили письмо?",
+    "resend": "Отправить еще раз"
   }
 }

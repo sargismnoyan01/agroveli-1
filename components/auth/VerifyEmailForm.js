@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl'; // Добавил импорт
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
@@ -10,6 +10,14 @@ export default function VerifyEmailForm() {
   const router = useRouter();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef([]);
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email');
+
+  useEffect(() => {
+    if(!email){
+      router.push('/login');
+    }
+  }, [email]);
 
   useEffect(() => {
     // Focus first input on mount
@@ -60,6 +68,7 @@ export default function VerifyEmailForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Verification code:', code.join(''));
+
     // Add your verification logic here
   };
 
@@ -75,7 +84,7 @@ export default function VerifyEmailForm() {
         {t('description')}
       </p>
       <p className="text-center text-[#FF6B2C] text-sm mb-8">
-        damien.creation@yahoo.com
+        {email}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -95,7 +104,7 @@ export default function VerifyEmailForm() {
           ))}
         </div>
 
-        <div className="text-center">
+        <div className="text-center my-4">
           <span className="text-sm text-gray-600">{t('resendText')} </span>
           <button
             type="button"
