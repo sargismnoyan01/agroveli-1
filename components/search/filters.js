@@ -70,7 +70,7 @@ export function SearchFilters({
   const categoriesList = [
     { value: "Овощи", label: t("categories.vegetables") },
     { value: "Фрукты", label: t("categories.fruits") },
-    { value: "Молочные продукты", label: t("categories.dairy") },
+    { value: "Молочные Продукты", label: t("categories.dairy") },
     { value: "Зерновые", label: t("categories.grains") },
     { value: "Саженцы", label: t("categories.seedlings") },
     { value: "Инструменты", label: t("categories.tools") },

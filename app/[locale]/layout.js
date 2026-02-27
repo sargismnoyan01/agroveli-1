@@ -6,6 +6,7 @@ import { Noto_Sans_Armenian, Noto_Sans_Georgian, Roboto } from 'next/font/google
 import Providers from "@/components/shared/Providers";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import { ToastContainer } from "react-toastify";
 
 export const metadata = {
   metadataBase: new URL('http://localhost:3000'),
@@ -85,6 +86,18 @@ export default async function RootLayout({ children, params }) {
     <html lang={locale}>
     <body className={`${roboto.variable} ${armenian.variable} ${georgian.variable} font-sans`}>
     <NextIntlClientProvider messages={messages} locale={locale}>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        limit={5}
+      />
       <Providers>
         {children}
       </Providers>
