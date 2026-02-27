@@ -70,13 +70,15 @@ export default function ForgotPasswordForm() {
         autoComplete="off"
       >
         {/* Email */}
-        <TextField
-          label={t('emailLabel')}
-          type="email"
-          placeholder={t('emailPlaceholder')}
-          {...register('email')}
-          error={errors.email?.message}
-        />
+       <div>
+         <TextField
+           label={t('emailLabel')}
+           type="email"
+           placeholder={t('emailPlaceholder')}
+           {...register('email')}
+           error={errors.email?.message}
+         />
+       </div>
 
         <Button
           disabled={isLoading || isSubmitting}
