@@ -89,7 +89,7 @@ export default function ProductPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              {data.me || true ? <>
+              {data.me ? <>
                 <Button
                   onClick={() => {
                     router.push(`/create?id=${data.id}`)
