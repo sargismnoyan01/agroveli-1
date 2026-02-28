@@ -77,9 +77,13 @@ function ProductCard({ product, }) {
   const [like, { isLoading }] = useLikeProductMutation();
   const currency = Cookies.get('selected_currency');
   const [isLiked, setIsLiked] = useState(product.is_liked);
+  const token = Cookies.get('accessToken');
 
   const handleToggleFavorite = async (productId) => {
-    await like({ id: productId });
+    if(token ){
+      await like({ id: productId });
+    }
+
     setIsLiked(!isLiked);
   }
 

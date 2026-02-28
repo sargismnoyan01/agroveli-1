@@ -39,6 +39,7 @@ export default function ProductPage() {
   const [isFavorite, setIsFavorite] = useState(data?.is_liked || false);
   const currency = Cookies.get('selected_currency');
   const router = useRouter();
+  const token = Cookies.get('accessToken');
 
   useEffect(() => {
     setIsFavorite(data?.is_liked)
@@ -240,7 +241,9 @@ export default function ProductPage() {
                 disabled={isLiking}
                 onClick={() => {
                   setIsFavorite(!isFavorite);
-                  like({ id: data.id });
+                  if(token) {
+                    like({ id: data.id });
+                  }
                 }} className="p-2 border-0 bg-transparent cursor-pointer hover:scale-110 transition-all">
                 <Heart
                   className={cn("h-6 w-6 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-muted-foreground")}/>
@@ -345,7 +348,10 @@ export default function ProductPage() {
                       disabled={isLiking}
                       onClick={() => {
                         setIsFavorite(!isFavorite);
-                        like({ id: data.id });
+                        if(token) {
+
+                          like({ id: data.id });
+                        }
                       }}
                       className="p-1 border-0 bg-transparent cursor-pointer hover:scale-110">
                 <Heart
