@@ -12,8 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { useForgotPasswordMutation } from "@/lib/store/services/authApi";
-// Предполагаем, что у вас есть такой эндпоинт в authApi
-// import { useForgotPasswordMutation } from "@/lib/store/services/authApi";
+import { toast } from "react-toastify";
 
 export default function ForgotPasswordForm() {
   const t = useTranslations('ForgotPasswordForm');
@@ -38,7 +37,8 @@ export default function ForgotPasswordForm() {
       const res = await forgotPassword(data).unwrap();
 
       if(res){
-        router.push(`/verify-email?email=${data.email}&token=${res.token}&uid=${res.uid}`)
+        toast.success(t('emailSent'));
+        router.push(`/login`)
       }
 
     } catch (error) {

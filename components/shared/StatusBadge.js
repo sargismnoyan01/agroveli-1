@@ -25,11 +25,11 @@ export default function StatusBadge({status}) {
   return(
     <div
       className={cn(
-        "inline-flex h-12 items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium no-underline",
+        "inline-flex h-10 items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium no-underline",
         colors[status],
       )}
     >
-      <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", colors[status],)}>
+      <div className={cn("rounded-lg flex items-center justify-center", colors[status],)}>
         {badgeIcons[status]}
       </div>
       <span>{statusTitles[status]}</span>

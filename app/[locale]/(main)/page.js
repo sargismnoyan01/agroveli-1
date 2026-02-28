@@ -43,7 +43,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       {showLoader && <FullScreenLoader />}
       <HeroBanner />
-      <main className="pb-20 md:pb-0">
+      <main className="">
         <CategoryFilters />
         <div className="container mx-auto px-4 py-6 space-y-8">
           {premiumPlusProducts?.results?.length > 0 && <ProductCarousel

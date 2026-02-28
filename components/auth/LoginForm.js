@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl'; // Добавлен импорт
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -82,7 +82,7 @@ export default function LoginForm() {
         />
 
         {/* Remember me */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-col gap-2 md:gap-1 items-center md:flex-row justify-between pt-2">
           <div className="flex items-center gap-2">
             <Checkbox
               id="keepLoggedIn"

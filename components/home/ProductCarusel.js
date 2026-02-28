@@ -127,7 +127,7 @@ function ProductCard({ product, }) {
         <div className="mt-3 px-3 pb-2">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-muted-foreground">{product.location}</p>
+              <p className="text-sm text-muted-foreground truncate">{product.location}</p>
               <h3 className="text-base text-[#0F6A4F] truncate font-bold">{product.name}</h3>
             </div>
             <button disabled={isLoading}

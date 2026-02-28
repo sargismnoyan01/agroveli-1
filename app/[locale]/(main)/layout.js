@@ -14,7 +14,7 @@ export default function RootLayout({
                                      children,
                                    }) {
   return (
-    <div>
+    <div className="pb-12 md:pb-0">
       <Header />
       {children}
       <MobileNavigation />

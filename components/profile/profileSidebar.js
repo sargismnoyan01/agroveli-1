@@ -15,7 +15,7 @@ import {
   Pencil,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useGetProfileQuery } from "@/lib/store/services/authApi";
+import { authApi, useGetProfileQuery } from "@/lib/store/services/authApi";
 import {  useTranslations } from "next-intl"; // Добавил импорт
 import ProfileSkeleton from "@/components/shared/ProfileSkeleton";
 import Cookies from "js-cookie";
@@ -49,7 +49,7 @@ export function ProfileSidebar() {
     return false;
   };
 
-  if (isLoading) {
+  if (isLoading || !userData) {
     return <ProfileSkeleton/>
   }
 

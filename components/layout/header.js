@@ -53,8 +53,7 @@ export function Header() {
   }, []);
 
   const token = Cookies.get('accessToken');
-  const { data } = useGetProfileQuery({skip: !token});
-
+  const { data , isLoading} = useGetProfileQuery({},{skip: !token});
   const handleLanguageChange = (newLocale) => {
     Cookies.set('NEXT_LOCALE', newLocale, { expires: 365 });
     router.replace(pathname, { locale: newLocale });
@@ -192,14 +191,26 @@ export function Header() {
                     ))}
                   </div>
 
-                  {data?.info ?
-                    <Link className={"block w-full"} href={"/profile"}>
-                      <Button onClick={()=> setMobileMenuOpen(false)} className="rounded-md px-6 h-10 w-full bg-[#0F6A4F] text-white">{t("profile")}</Button>
-                    </Link> :
+                  {!data?.info && !isLoading &&
                     <Link className={"block w-full"} href={"/login"}>
                       <Button onClick={()=> setMobileMenuOpen(false)} className="rounded-md w-full px-6 h-10 bg-[#0F6A4F] text-white">{t("login")}</Button>
                     </Link>
                   }
+
+                  <div className="flex flex-col gap-4">
+                    <a
+                      href="/privacy-policy"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {t("privacyPolicy")}
+                    </a>
+                    <a
+                      href="/terms"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {t("terms")}
+                    </a>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

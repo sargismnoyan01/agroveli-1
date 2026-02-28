@@ -9,7 +9,7 @@ import { useGetProfileQuery } from "@/lib/store/services/authApi"; // Добав
 export function Footer() {
   const t = useTranslations("Footer"); // Инициализация
   const token = Cookies.get('accessToken');
-  const { data } = useGetProfileQuery({skip: !token});
+  const { data } = useGetProfileQuery(undefined, {skip: !token});
 
   return (
     <footer className="bg-muted/50 border-t border-border mt-auto hidden md:block">
@@ -90,13 +90,13 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="#"
+              href="/privacy-policy"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("privacyPolicy")}
             </a>
             <a
-              href="#"
+              href="/terms"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("terms")}

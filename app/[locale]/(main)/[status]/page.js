@@ -34,10 +34,11 @@ export default function SearchPage() {
 
         {/* Хлебные крошки */}
         <div className="flex items-center gap-2 text-sm mb-6">
-          <Link href="/" className="flex items-center gap-2 hover:scale-[1.1]">
+          <Link href="/" className="flex items-center gap-2 no-underline text-muted-foreground hover:text-black">
             <ArrowLeft className="h-4 w-4" />
+            <span>{t("breadcrumb_home")}</span>
           </Link>
-          <span>{t("breadcrumb_home")}</span>
+
           <span>/</span>
           <span >{statusTitles[status]}</span>
         </div>

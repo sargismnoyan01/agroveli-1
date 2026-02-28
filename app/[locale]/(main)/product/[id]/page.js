@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useTranslations } from "next-intl" // Импорт
 import Link from "next/link"
 import Image from "next/image"
@@ -16,12 +16,12 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronLeft,
-  ChevronRight, Sparkles,
+  ChevronRight, Edit2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useParams } from "next/navigation";
-import { useGetProductQuery } from "@/lib/store/services/productApi";
+import { useParams, useRouter } from "next/navigation";
+import { useGetProductQuery, useLikeProductMutation } from "@/lib/store/services/productApi";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { ProductDetailsSkeleton } from "@/components/shared/ProductDetailsSkeleton";
 import Cookies from "js-cookie";
@@ -29,14 +29,20 @@ import { ProductCarousel } from "@/components/home/ProductCarusel";
 
 export default function ProductPage() {
   const t = useTranslations("ProductPage"); // Инициализация
-  const [isFavorite, setIsFavorite] = useState(true)
+  const [like, { isLoading: isLiking }] = useLikeProductMutation();
   const [thumbsSwiper, setThumbsSwiper] = useState(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [copied, setCopied] = useState(false)
   const mainSwiperRef = useRef(null);
-  const {id} = useParams();
-  const {data, isLoading, isFetching} = useGetProductQuery({id});
+  const { id } = useParams();
+  const { data, isLoading, isFetching } = useGetProductQuery({ id });
+  const [isFavorite, setIsFavorite] = useState(data?.is_liked || false);
   const currency = Cookies.get('selected_currency');
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsFavorite(data?.is_liked)
+  }, [data])
 
   const handleCopyArticle = () => {
     if (data?.article) {
@@ -56,11 +62,11 @@ export default function ProductPage() {
     }
   }
 
-  if(isLoading || isFetching){
+  if (isLoading || isFetching) {
     return <ProductDetailsSkeleton/>;
   }
 
-  if(!data){
+  if (!data) {
     return null;
   }
 
@@ -71,17 +77,40 @@ export default function ProductPage() {
         <div className=" mx-auto px-4 py-4 md:px-10 lg:px-12 xl:px-16 2xl:px-48">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm">
-              <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
-                <ArrowLeft className="h-4 w-4" />
+              <Link href="/"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground no-underline">
+                <ArrowLeft className="h-4 w-4"/>
+                <span>{t("home")}</span>
               </Link>
-              <span className="text-muted-foreground">{t("home")}</span>
               <span className="text-muted-foreground">/</span>
               <span className="text-muted-foreground">{t(`categories.${data.category}`)}</span>
               <span className="text-muted-foreground">/</span>
               <span className="text-foreground font-medium">{data.name}</span>
             </div>
 
-            {data.status !== "ORDINARY" && <StatusBadge status={data.status} />}
+            <div className="flex items-center gap-2">
+              {data.me || true ? <>
+                <Button
+                  onClick={() => {
+                    router.push(`/create?id=${data.id}`)
+                  }}
+                  variant="outline"
+                  className="hidden md:flex rounded-md px-6 h-10 bg-transparent text-[#0F6A4F] border-[#0F6A4F]">
+                  <Edit2 className="h-4 w-4 mr-2"/>
+                  {t("edit")}
+                </Button>
+                <button
+                  onClick={() => {
+                    router.push(`/create?id=${data.id}`)
+                  }}
+                  className="block md:hidden">
+                  <Edit2 className="h-6 w-6 mr-2 text-brand"/>
+                </button>
+              </> : ""
+              }
+
+              {data.status !== "ORDINARY" && <StatusBadge status={data.status}/>}
+            </div>
 
           </div>
         </div>
@@ -99,7 +128,7 @@ export default function ProductPage() {
               className="rounded-full h-8 w-8 bg-background"
               onClick={() => scrollThumbs("up")}
             >
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-4 w-4"/>
             </Button>
 
             <div className="h-[400px] overflow-hidden">
@@ -141,7 +170,7 @@ export default function ProductPage() {
               className="rounded-full h-8 w-8 bg-background"
               onClick={() => scrollThumbs("down")}
             >
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-4 w-4"/>
             </Button>
           </div>
 
@@ -181,7 +210,7 @@ export default function ProductPage() {
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full h-10 w-10 bg-background/80 hover:bg-background"
               onClick={() => mainSwiperRef.current?.slidePrev()}
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5"/>
             </Button>
             <Button
               variant="outline"
@@ -189,7 +218,7 @@ export default function ProductPage() {
               className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full h-10 w-10 bg-background/80 hover:bg-background"
               onClick={() => mainSwiperRef.current?.slideNext()}
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-5 w-5"/>
             </Button>
           </div>
 
@@ -201,29 +230,38 @@ export default function ProductPage() {
                     {currency === "AMD" ? Number(data.price_dram) : Number(data.price_lari)}
                   </span>
                 <div className="flex items-center gap-1">
-                  <span className="w-6 h-6 rounded-full bg-muted flex items-center text-2xl justify-center text-xs font-medium text-brand">{currency === "AMD" ? "֏" : "₾"}</span>
+                  <span
+                    className="w-6 h-6 rounded-full bg-muted flex items-center text-2xl justify-center text-xs font-medium text-brand">{currency === "AMD" ? "֏" : "₾"}</span>
                 </div>
                 <span className="text-muted-foreground">/{data.unit_of_measurement}</span>
               </div>
-              <button type="button" onClick={() => setIsFavorite(!isFavorite)} className="p-2 border-0 bg-transparent cursor-pointer hover:scale-110 transition-all">
-                <Heart className={cn("h-6 w-6 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+              <button
+                type="button"
+                disabled={isLiking}
+                onClick={() => {
+                  setIsFavorite(!isFavorite);
+                  like({ id: data.id });
+                }} className="p-2 border-0 bg-transparent cursor-pointer hover:scale-110 transition-all">
+                <Heart
+                  className={cn("h-6 w-6 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-muted-foreground")}/>
               </button>
             </div>
 
             <h1 className="text-2xl font-bold text-foreground mb-1">{data.name}</h1>
             <p className="text-muted-foreground mb-4">{data.location}</p>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4 pb-4 border-b border-border">
+            <div
+              className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4 pb-4 border-b border-border">
               <div className="flex items-center gap-1.5">
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4"/>
                 <span>{data.detail.view_count} {t("views")}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Heart className="h-4 w-4" />
+                <Heart className="h-4 w-4"/>
                 <span>{data.detail.like_count} {t("favorites")}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4"/>
                 <span>{data.created_at} {t("datePlaced")}</span>
               </div>
             </div>
@@ -235,31 +273,33 @@ export default function ProductPage() {
               <span className="font-semibold text-foreground">{data.user.first_name} {data.user.last_name}</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground mb-6">
-              <Phone className="h-4 w-4" />
-              <Link className={' text-muted-foreground no-underline'} href={`tel: ${data.user.phone}`}>{data.user.phone}</Link>
+              <Phone className="h-4 w-4"/>
+              <Link className={' text-muted-foreground no-underline'}
+                    href={`tel: ${data.user.phone}`}>{data.user.phone}</Link>
             </div>
 
-            <hr className="text-muted-foreground border-t-[#E8E9EA] mb-4" />
+            <hr className="text-muted-foreground border-t-[#E8E9EA] mb-4"/>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-muted-foreground">{t("article")}</span>
-                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30" />
+                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30"/>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{data.article}</span>
-                  <button type="button" onClick={handleCopyArticle} className="p-1 hover:bg-muted rounded bg-transparent border-0 cursor-pointer">
-                    <Copy className="h-4 w-4 text-muted-foreground" />
+                  <button type="button" onClick={handleCopyArticle}
+                          className="p-1 hover:bg-muted rounded bg-transparent border-0 cursor-pointer">
+                    <Copy className="h-4 w-4 text-muted-foreground"/>
                   </button>
                 </div>
               </div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-muted-foreground">{t("category")}</span>
-                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30" />
+                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30"/>
                 <span className="font-medium">{t(`categories.${data.category}`)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("origin")}</span>
-                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30" />
+                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30"/>
                 <span className="font-medium">{data.location}</span>
               </div>
             </div>
@@ -279,7 +319,8 @@ export default function ProductPage() {
             {data.images.map((image, index) => (
               <SwiperSlide key={index}>
                 <div className="aspect-[4/3] rounded-xl overflow-hidden">
-                  <Image src={image.image || "/placeholder.svg"} alt="product" width={600} height={450} className="w-full h-full object-cover" />
+                  <Image src={image.image || "/placeholder.svg"} alt="product" width={600} height={450}
+                         className="w-full h-full object-cover"/>
                 </div>
               </SwiperSlide>
             ))}
@@ -300,25 +341,33 @@ export default function ProductPage() {
                   /{data.unit_of_measurement} ({t("max")} {data.count} кг)
                 </span>
               </div>
-              <button type="button" onClick={() => setIsFavorite(!isFavorite)} className="p-1 border-0 bg-transparent cursor-pointer hover:scale-110">
-                <Heart className={cn("h-6 w-6 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+              <button type="button"
+                      disabled={isLiking}
+                      onClick={() => {
+                        setIsFavorite(!isFavorite);
+                        like({ id: data.id });
+                      }}
+                      className="p-1 border-0 bg-transparent cursor-pointer hover:scale-110">
+                <Heart
+                  className={cn("h-6 w-6 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-muted-foreground")}/>
               </button>
             </div>
 
             <h1 className="text-xl font-bold text-foreground mb-1">{data.name}</h1>
             <p className="text-muted-foreground text-sm mb-3 pb-3 border-b border-border">{data.location}</p>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-3 pb-3 border-b border-border">
+            <div
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-3 pb-3 border-b border-border">
               <div className="flex items-center gap-1.5">
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4"/>
                 <span>{data.detail.view_count} {t("views")}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Heart className="h-4 w-4" />
+                <Heart className="h-4 w-4"/>
                 <span>{data.detail.like_count} {t("favorites")}</span>
               </div>
               <div className="flex items-center gap-1.5 w-full">
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4"/>
                 <span>{t("datePlaced")}: {data.created_at}</span>
               </div>
             </div>
@@ -331,27 +380,30 @@ export default function ProductPage() {
             </div>
 
             <div className="flex items-center gap-2 text-muted-foreground mb-4 pb-4 border-b border-border">
-              <Phone className="h-4 w-4" />
-              <Link className={' text-muted-foreground no-underline'} href={`tel: ${data.user.phone}`}>{data.user.phone}</Link>
+              <Phone className="h-4 w-4"/>
+              <Link className={' text-muted-foreground no-underline'}
+                    href={`tel: ${data.user.phone}`}>{data.user.phone}</Link>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-muted-foreground text-sm">{t("article")}</span>
-                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30" />
+                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30"/>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm">{data.article}</span>
-                  <button type="button" onClick={handleCopyArticle} className="p-1 hover:bg-muted rounded bg-transparent border-0"><Copy className="h-4 w-4 text-muted-foreground" /></button>
+                  <button type="button" onClick={handleCopyArticle}
+                          className="p-1 hover:bg-muted rounded bg-transparent border-0"><Copy
+                    className="h-4 w-4 text-muted-foreground"/></button>
                 </div>
               </div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-muted-foreground text-sm">{t("category")}</span>
-                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30" />
+                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30"/>
                 <span className="font-medium text-sm">{t(`categories.${data.category}`)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">{t("origin")}</span>
-                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30" />
+                <div className="flex-1 mx-2 border-b border-dotted border-muted-foreground/30"/>
                 <span className="font-medium text-sm">{data.location}</span>
               </div>
             </div>
@@ -379,7 +431,8 @@ export default function ProductPage() {
       </main>
 
       {copied && (
-        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 bg-foreground text-background px-4 py-2 rounded-lg text-sm z-50">
+        <div
+          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 bg-foreground text-background px-4 py-2 rounded-lg text-sm z-50">
           {t("copied")}
         </div>
       )}
