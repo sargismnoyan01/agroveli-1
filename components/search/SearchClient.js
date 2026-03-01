@@ -11,7 +11,8 @@ import { useGetProductsQuery } from "@/lib/store/services/productApi";
 import { ProductCardSkeleton } from "@/components/shared/ProductCardSkeleton";
 import CustomPagination from "@/components/shared/CustomPagination";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl"; // Добавлен импорт
+import { useTranslations } from "next-intl";
+import HeaderSearch from "@/components/layout/Search"; // Добавлен импорт
 
 export const initialFilters = {
   price_from: "",
@@ -76,6 +77,9 @@ export default function SearchClient() {
 
       <main className="flex-1 px-4 md:px-10 lg:px-12 mx-auto w-full py-6 pb-24 md:pb-6">
         {/* Mobile Filter Button */}
+        <div className="md:hidden mb-4">
+          <HeaderSearch/>
+        </div>
         <div className="md:hidden mb-4 flex items-center justify-between">
           <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
             <SheetTrigger asChild>

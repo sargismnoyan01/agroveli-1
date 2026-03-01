@@ -22,7 +22,7 @@ import {
   LayoutGrid,
 } from "lucide-react"
 import {
-  useCreateProductMutation,
+  useCreateProductMutation, useGetPlansQuery,
   useGetProductQuery,
   useUpdateProductMutation
 } from "@/lib/store/services/productApi";
@@ -37,12 +37,13 @@ export default function CreateProductForm() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { data } = useGetProductQuery({ id }, { skip: !id });
+  const {data: plans} = useGetPlansQuery();
   const currency = Cookies.get('selected_currency');
   const unitOptions = [
     { value: "KG", label: t("units.KG") },
     { value: "L", label: t("units.L") },
     { value: "YEAR", label: t("units.YEAR") },
-  ]
+  ];
 
   const premiumPlans = [
     {
@@ -53,21 +54,7 @@ export default function CreateProductForm() {
       borderColor: "border-[#E8E9EA]",
       hoverBorder: "hover:border-brand",
       icon: Zap,
-      priceMonthly: "12.00",
-      priceDaily: "3.00",
       features: [t("plans.vip_feature")],
-    },
-    {
-      id: "PREMIUM_PLUS",
-      name: "Premium +",
-      color: "text-[#FFCC00]",
-      bgColor: "bg-[#FFCC00]",
-      borderColor: "border-[#E8E9EA]",
-      hoverBorder: "hover:border-[#FFCC00]",
-      icon: Crown,
-      priceMonthly: "32.00",
-      priceDaily: "9.00",
-      features: [t("plans.premium_plus_f1"), t("plans.premium_plus_f2")],
     },
     {
       id: "PREMIUM",
@@ -77,11 +64,34 @@ export default function CreateProductForm() {
       borderColor: "border-[#E8E9EA]",
       hoverBorder: "hover:border-[#FF6400]",
       icon: Sparkles,
-      priceMonthly: "24.00",
-      priceDaily: "5.00",
       features: [t("plans.premium_f1"), t("plans.premium_f2")],
     },
-  ]
+    {
+      id: "PREMIUM_PLUS",
+      name: "Premium +",
+      color: "text-[#FFCC00]",
+      bgColor: "bg-[#FFCC00]",
+      borderColor: "border-[#E8E9EA]",
+      hoverBorder: "hover:border-[#FFCC00]",
+      icon: Crown,
+      features: [t("plans.premium_plus_f1"), t("plans.premium_plus_f2")],
+    },
+  ];
+
+  const mergedPlans = premiumPlans.map(plan => {
+    const apiInfo = plans?.find(item => item.status === plan.id);
+
+    if(!apiInfo){
+      return plan;
+    }
+
+    return {
+      ...plan,
+      serverDbId: apiInfo?.id,
+      priceMonthly: apiInfo.price.toFixed(2),
+      displayName: apiInfo?.status_display || plan.name
+    };
+  });
 
   const [formData, setFormData] = useState({
     unit_of_measurement: "",
@@ -115,7 +125,7 @@ export default function CreateProductForm() {
       });
       setImages(data?.images?.map(img => ({url: img.image, id: img.image}) || [])),
         setSelectedCategory(data.category);
-      setSelectedPlan(data.status)
+      !selectedPlan && setSelectedPlan(data.status)
     }
 
   }, [data]);
@@ -222,6 +232,10 @@ export default function CreateProductForm() {
     fd.append("count", String(Number(formData.maxQuantity)));
     fd.append("description", formData.description);
     fd.append("unit_of_measurement", formData.unit_of_measurement);
+
+    if(selectedPlan){
+      fd.append("status", selectedPlan);
+    }
 
     images.forEach((img) => {
       if(img.file){
@@ -458,7 +472,7 @@ export default function CreateProductForm() {
                 <span>{t("quickSale")}</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {premiumPlans.map((plan) => {
+                {mergedPlans.map((plan) => {
                   const Icon = plan.icon
                   const isSelected = selectedPlan === plan.id
                   return (
@@ -490,8 +504,8 @@ export default function CreateProductForm() {
                       </div>
                       <div className="flex items-center justify-between pt-3 border-t border-border">
                         <div>
-                          <span className="text-lg font-bold">{plan.priceDaily}₾</span>
-                          <span className="text-sm text-muted-foreground">{t("perDay")}</span>
+                          <span className="text-lg font-bold">{plan.priceMonthly}₾</span>
+                          <span className="text-sm text-muted-foreground">{t("perMonth")}</span>
                         </div>
                         <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors", isSelected ? (plan.id === "vip" ? "border-brand bg-brand" : plan.id === "premium-plus" ? "border-[#FFCC00] bg-[#FFCC00]" : "border-[#FF6400] bg-[#FF6400]") : "border-muted-foreground/30")}>
                           {isSelected && <Check className="h-3.5 w-3.5 text-white"/>}
@@ -507,7 +521,9 @@ export default function CreateProductForm() {
             <section className="bg-card rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-4 md:p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <p className="text-sm text-muted-foreground">{t("checkData")}</p>
-                <Button onClick={handleSubmit} disabled={isLoading || isUpdating} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-8 h-11">
+                <Button
+                  type={"button"}
+                  onClick={handleSubmit} disabled={isLoading || isUpdating} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-8 h-11">
                   {isLoading ? t("publishing") : t("publish")}
                 </Button>
               </div>

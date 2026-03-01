@@ -18,8 +18,8 @@ export function MobileNavigation() {
 
   const navItems = [
     { id: "/", label: t("home"), icon: Home },
-    { id: "/create", label: t("add"), icon: PlusSquare },
-    { id: "/profile/favorites", label: t("favorites"), icon: Heart },
+    { id: "/create", label: t("add"), icon: PlusSquare, disabled: !data?.info },
+    { id: "/profile/favorites", label: t("favorites"), icon: Heart, disabled: !data?.info },
     ...(data?.info
         ? [{ id: "/profile/products", label: t("profile"), icon: User }]
         : [{ id: "/login", label: t("login"), icon: User }]
@@ -47,7 +47,10 @@ export function MobileNavigation() {
             <Link
               href={item.id}
               key={item.id}
-              className="flex flex-col items-center justify-center gap-1 min-w-[64px] transition-all no-underline"
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 min-w-[64px] transition-all no-underline",
+                item.disabled ? "opacity-30 pointer-events-none" : "",
+              )}
             >
               <Icon
                 className={cn(

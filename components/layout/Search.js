@@ -15,9 +15,7 @@ export default function HeaderSearch() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    if(q){
-      setSearchQuery(q)
-    }
+    setSearchQuery(q || "")
   }, [q]);
 
   return (

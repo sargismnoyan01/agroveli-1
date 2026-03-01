@@ -386,7 +386,13 @@ export default function ProductPage() {
 
             <div className="flex items-center gap-3 mb-3 pb-3 border-b border-border">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                <span className="text-muted-foreground text-lg">{data.user.first_name.charAt(0)}</span>
+                <Image
+                  src={data.user?.img_url || "/assets/images/profile.png"}
+                  alt={data.user?.first_name + ' ' + data.user?.last_name}
+                  width={56}
+                  height={56}
+                  className="rounded-full object-cover w-14 h-14"
+                />
               </div>
               <span className="font-semibold text-foreground">{data.user.first_name} {data.user.last_name}</span>
             </div>

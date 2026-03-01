@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useState, useEffect } from "react"
-import { Search, ChevronDown, Menu } from "lucide-react"
+import { Search, ChevronDown, Menu, X, Instagram, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -11,12 +11,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { authApi, useGetProfileQuery } from "@/lib/store/services/authApi";
+import { authApi, useGetMainInfoQuery, useGetProfileQuery } from "@/lib/store/services/authApi";
 import Logo from "@/components/shared/Logo";
 import Cookies from "js-cookie";
 import HeaderSearch from "@/components/layout/Search";
 
-import { useLocale, useTranslations } from "next-intl"; // Добавил useTranslations
+import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter, usePathname } from "@/i18n/navigation";
 import { useDispatch } from "react-redux";
 import { productApi } from "@/lib/store/services/productApi";
@@ -38,7 +38,7 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
-
+  const { data: info } = useGetMainInfoQuery();
   const currentLanguage = languages.find(l => l.code === locale) || languages[0];
 
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
@@ -70,7 +70,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-[#E8E9EA] border-b border-border">
-      <div className="mx-auto px-8 md:px-10 lg:px-12">
+      <div className="mx-auto px-4 md:px-10 lg:px-12">
         <div className="hidden md:flex items-center justify-between h-16 gap-4">
           <div className={"flex items-center gap-6 lg:w-4/12"}>
             <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -150,6 +150,9 @@ export function Header() {
               </Button>
             </Link>
 
+            <span className="text-lg">{currentLanguage.flag}</span>
+
+
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 bg-transparent border-0">
@@ -157,10 +160,16 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               {/* Добавил h-full и flex flex-col для SheetContent */}
-              <SheetContent side="right" className="w-80 flex flex-col h-full">
-                <div className="flex flex-col gap-6">
+              <SheetContent side="right" className="w-full flex flex-col h-full px-4 pt-0 pb-8">
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="absolute top-2 right-4 p-2 rounded-md hover:bg-muted transition"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+                <div className="flex flex-col gap-6 mt-2">
                   <div className="space-y-4">
-                    <h3 className="font-medium">{t("language")}</h3>
+                    <h3 className="font-medium mb-1">{t("language")}</h3>
                     {languages.map((lang) => (
                       <button
                         key={lang.code}
@@ -178,7 +187,7 @@ export function Header() {
                     ))}
                   </div>
                   <div className="space-y-4">
-                    <h3 className="font-medium">{t("currency")}</h3>
+                    <h3 className="font-medium mb-1">{t("currency")}</h3>
                     {currencies.map((currency) => (
                       <button
                         key={currency.code}
@@ -213,6 +222,52 @@ export function Header() {
                       {t("terms")}
                     </a>
                   </div>
+                  <div className="space-y-4 mt-4">
+                    <nav className="flex flex-col gap-2">
+                      {info?.gmail ? <a
+                        href={`mailto: ${info.gmail}`}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+                      >
+                        {info?.gmail}
+                      </a> : ""}
+                      {info?.site_phone ? <a
+                        href={`tel: ${info.site_phone}`}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+                      >
+                        +995 32 280 00 45
+                      </a> : ""}
+                      <div className="flex items-center gap-3 mt-2">
+                        {info?.instagram_url ? <a
+                          href={info.instagram_url}
+                          target="_blank"
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Instagram"
+                        >
+                          <Instagram className="h-5 w-5"/>
+                        </a> : ""}
+                        {info?.facebook_url ? <a
+                          href={info.facebook_url}
+                          target="_blank"
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Facebook"
+                        >
+                          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                          </svg>
+                        </a> : ""}
+                        {info?.telegram_url ? <a
+                          href={info.telegram_url}
+                          target="_blank"
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Facebook"
+                        >
+                          <Send className="h-5 w-5"/>
+                        </a> : ""}
+
+                      </div>
+                    </nav>
+                  </div>
                 </div>
 
                 <div className="mt-auto pt-4">
@@ -240,7 +295,6 @@ export function Header() {
                 </div>
               </SheetContent>
             </Sheet>
-            <span className="text-lg">{currentLanguage.flag}</span>
           </div>
         </div>
       </div>
