@@ -91,7 +91,7 @@ export function ProfileSidebar() {
               </div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
                 <Wallet className="h-4 w-4 shrink-0"/>
-                <span>{t("balance")}: {userData.info.balance || 0}</span>
+                <span>{t("balance")}: {userData.info.coin || 0}</span>
               </div>
             </div>
 
