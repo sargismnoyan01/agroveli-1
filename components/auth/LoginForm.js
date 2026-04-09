@@ -110,7 +110,7 @@ export default function LoginForm() {
         <Button
           disabled={isLoading || isSubmitting}
           type="submit"
-          className="w-full mt-6"
+          className="w-full mt-6 bg-brand hover:bg-brand-hover"
         >
           {t('loginButton')}
           <ArrowRight size={20} />

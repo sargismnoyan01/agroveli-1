@@ -85,7 +85,8 @@ export default function ResetPasswordForm() {
         <Button
           disabled={isLoading || isSubmitting}
           type="submit"
-          className="w-full mt-6"
+          className="w-full mt-6 bg-brand hover:bg-brand-hover"
+
         >
           {t('resetButton')}
           <ArrowRight size={20}/>

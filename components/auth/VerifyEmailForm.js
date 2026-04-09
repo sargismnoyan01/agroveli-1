@@ -130,7 +130,9 @@ export default function VerifyEmailForm() {
           </button>
         </div>
 
-        <Button disabled={isLoading || code.some(item => !item)} type="submit" className="w-full">
+        <Button disabled={isLoading || code.some(item => !item)} type="submit"
+                className="w-full bg-brand hover:bg-brand-hover"
+        >
           {t('verifyButton')}
           <ArrowRight size={20}/>
         </Button>

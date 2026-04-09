@@ -76,19 +76,22 @@ export default function ProductPage() {
       {/*Breadcrumb Header*/}
       <div className="bg-background border-b border-border">
         <div className=" mx-auto px-4 py-4 md:px-10 lg:px-12 xl:px-16 2xl:px-48">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-sm min-w-0 w-full">
               <Link href="/"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground no-underline">
-                <ArrowLeft className="h-4 w-4"/>
+                    className="flex flex-shrink-0 items-center gap-2 text-muted-foreground hover:text-foreground no-underline">
+                <ArrowLeft className="h-4 w-4 flex-shrink-0"/>
                 <span>{t("home")}</span>
               </Link>
-              <span className="text-muted-foreground">/</span>
-              <span className="text-muted-foreground">{t(`categories.${data.category}`)}</span>
-              <span className="text-muted-foreground">/</span>
-              <span className="text-foreground font-medium">{data.name}</span>
+              <span className="text-muted-foreground flex-shrink-0">/</span>
+              <span className="text-muted-foreground truncate">
+                {t(`categories.${data.category}`)}
+              </span>
+              <span className="text-muted-foreground flex-shrink-0">/</span>
+              <span className="text-foreground font-medium truncate">
+                {data.name}
+              </span>
             </div>
-
             <div className="flex items-center gap-2">
               {data.me ? <>
                 <Button
@@ -241,7 +244,7 @@ export default function ProductPage() {
                 disabled={isLiking}
                 onClick={() => {
                   setIsFavorite(!isFavorite);
-                  if(token) {
+                  if (token) {
                     like({ id: data.id });
                   }
                 }} className="p-2 border-0 bg-transparent cursor-pointer hover:scale-110 transition-all">
@@ -354,7 +357,7 @@ export default function ProductPage() {
                       disabled={isLiking}
                       onClick={() => {
                         setIsFavorite(!isFavorite);
-                        if(token) {
+                        if (token) {
 
                           like({ id: data.id });
                         }

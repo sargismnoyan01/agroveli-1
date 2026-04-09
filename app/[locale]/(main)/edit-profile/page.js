@@ -173,7 +173,7 @@ export default function EditProfilePage() {
                   type="button"
                   variant="outline"
                   onClick={handleAvatarDelete}
-                  className="rounded-md px-5 h-9 text-sm border-red-500 text-red-500 bg-[#FF383C0D] "
+                  className="rounded-md px-5 h-9 text-sm border-red-500 text-red-500 bg-[#FF383C0D] hover:bg-transparent hover:border-brand hover:text-brand"
                 >
                   {t("delete")}
                 </Button>

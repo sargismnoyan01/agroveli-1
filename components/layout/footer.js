@@ -18,14 +18,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo & Description */}
           <div className="space-y-4">
-            <div className="text-xl font-bold">
+            <div className="text-xl font-bold mb-4">
               <span className="text-emerald-600">Agro</span>
               <span className="text-foreground">veli</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               {t("description")}
             </p>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-2">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               {t("dev_by")}
               {" "}
               <span className="text-base text-black">

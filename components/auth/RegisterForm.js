@@ -116,7 +116,9 @@ export default function RegisterForm() {
 
         <Button
           disabled={isLoading || isSubmitting}
-          type="submit" className="w-full mt-6">
+          type="submit"
+          className="w-full mt-6 bg-brand hover:bg-brand-hover"
+        >
           {t("registerButton")}
           <ArrowRight size={20}/>
         </Button>

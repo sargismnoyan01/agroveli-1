@@ -83,7 +83,8 @@ export default function ForgotPasswordForm() {
         <Button
           disabled={isLoading || isSubmitting}
           type="submit"
-          className="w-full mt-6"
+          className="w-full mt-6 bg-brand hover:bg-brand-hover"
+
         >
           {t('submitButton')}
           <ArrowRight size={20} className="ml-2" />

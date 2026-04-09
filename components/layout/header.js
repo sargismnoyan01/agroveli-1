@@ -69,7 +69,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#E8E9EA] border-b border-border">
+    <header className="sticky top-0 z-50 bg-white border-b border-border">
       <div className="mx-auto px-4 md:px-10 lg:px-12">
         <div className="hidden md:flex items-center justify-between h-16 gap-4">
           <div className={"flex items-center gap-6 lg:w-4/12"}>

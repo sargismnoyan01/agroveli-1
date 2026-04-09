@@ -21,7 +21,7 @@ export function HeroBanner() {
       <div className="w-full h-full mx-auto px-8 relative z-10 flex items-center justify-start">
         <div className="flex items-center min-h-[320px]">
           <div className="max-w-md py-10 relative z-10">
-            <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight text-balance">
+            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-4 leading-tight text-balance">
               {t("title")}
             </h1>
             <p className="text-white/90 text-base mb-6 leading-relaxed">
