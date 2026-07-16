@@ -97,11 +97,18 @@ export function ProfileSidebar() {
 
             {/* Actions */}
             <div className="mt-4 pt-4 border-t border-border space-y-2.5">
-              <button
+              {/* <button
                 className="flex items-center gap-3 text-sm text-foreground hover:text-emerald-600 transition-colors mb-2 bg-transparent border-0 cursor-pointer">
                 <CreditCard className="h-4 w-4"/>
                 <span>{t("topUp")}</span>
-              </button>
+              </button> */}
+              <Link
+  href="/profile/top-up"
+  className="flex items-center gap-3 text-sm text-foreground hover:text-emerald-600 transition-colors mb-2 no-underline"
+>
+  <CreditCard className="h-4 w-4" />
+  <span>{t("topUp")}</span>
+</Link>
               <Link
                 href="/create"
                 className="flex items-center gap-3 text-sm text-foreground hover:text-emerald-600 transition-colors mb-2 no-underline"
@@ -184,17 +191,19 @@ export function ProfileSidebar() {
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Wallet className="h-4 w-4 shrink-0"/>
-              <span>{t("balance")}: {userData.info?.balance || 0}</span>
+              <span>{t("balance")}: {userData.info?.coin || 0}</span>
             </div>
           </div>
 
           {/* Actions */}
           <div className="mt-4 pt-4 border-t border-border space-y-2.5">
-            <button
-              className="flex items-center gap-3 text-sm text-foreground hover:text-emerald-600 transition-colors mb-2 bg-transparent border-0 cursor-pointer">
-              <CreditCard className="h-4 w-4"/>
-              <span>{t("topUp")}</span>
-            </button>
+           <Link
+  href="/profile/top-up"
+  className="flex items-center gap-3 text-sm text-foreground hover:text-emerald-600 transition-colors mb-2 no-underline"
+>
+  <CreditCard className="h-4 w-4" />
+  <span>{t("topUp")}</span>
+</Link>
             <Link
               href="/create"
               className="flex items-center gap-3 text-sm text-foreground hover:text-emerald-600 transition-colors mb-2 no-underline"
