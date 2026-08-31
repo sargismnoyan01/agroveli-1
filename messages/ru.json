@@ -241,7 +241,12 @@
   "loading": "Загрузка...",
   "processing": "Пополнение...",
   "failed": "Не удалось пополнить баланс",
-  "placeholder": "Например 100.00"
+  "placeholder": "Например 100.00",
+  "returnLoading": "Подтверждаем оплату...",
+  "returnSuccess": "Оплата прошла успешно",
+  "returnTitle": "Баланс пополнен",
+  "returnButton": "Вернуться на сайт",
+  "returnAuto": "Автоматический возврат на сайт через {seconds} сек."
 },
   "FiltersPage": {
     "title": "Детальный фильтр",

@@ -15,19 +15,39 @@ import {
   Pencil,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react";
 import { authApi, useGetProfileQuery } from "@/lib/store/services/authApi";
 import {  useTranslations } from "next-intl"; // Добавил импорт
 import ProfileSkeleton from "@/components/shared/ProfileSkeleton";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { productApi } from "@/lib/store/services/productApi";
+import { BALANCE_CREDITED_EVENT } from "@/components/profile/BalanceAnimation";
 
 export function ProfileSidebar() {
   const t = useTranslations("ProfileSidebar"); // Инициализация
   const pathname = usePathname();
   const { data: userData, isLoading } = useGetProfileQuery();
   const dispatch = useDispatch();
-  const locale = "ru";
+  const locale = "hy";
+  const serverCoin = Number(userData?.info?.coin || 0);
+  const [displayCoin, setDisplayCoin] = useState(serverCoin);
+
+  useEffect(() => {
+    setDisplayCoin(serverCoin);
+  }, [serverCoin]);
+
+  useEffect(() => {
+    const onCredit = (event) => {
+      const nextCoin = Number(event.detail?.coin);
+      if (Number.isFinite(nextCoin)) {
+        setDisplayCoin(nextCoin);
+      }
+    };
+
+    window.addEventListener(BALANCE_CREDITED_EVENT, onCredit);
+    return () => window.removeEventListener(BALANCE_CREDITED_EVENT, onCredit);
+  }, []);
 
   // Перенес navLinks внутрь компонента, чтобы использовать t()
   const navLinks = [
@@ -89,10 +109,12 @@ export function ProfileSidebar() {
                 <Phone className="h-4 w-4 shrink-0"/>
                 <span>{userData.info?.phone}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
-                <Wallet className="h-4 w-4 shrink-0"/>
-                <span>{t("balance")}: {userData.info.coin || 0}</span>
-              </div>
+             <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
+  <Wallet className="h-4 w-4 shrink-0"/>
+<span data-profile-balance className="inline-block">
+  {t("balance")}: {displayCoin} ₾
+</span>
+</div>
             </div>
 
             {/* Actions */}
@@ -189,10 +211,15 @@ export function ProfileSidebar() {
               <Phone className="h-4 w-4 shrink-0"/>
               <span>{userData.info?.phone}</span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Wallet className="h-4 w-4 shrink-0"/>
-              <span>{t("balance")}: {userData.info?.coin || 0}</span>
-            </div>
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+
+  <Wallet className="h-4 w-4 shrink-0"/>
+
+<span data-profile-balance className="inline-block">
+  {t("balance")}: {displayCoin} ₾
+</span>
+
+</div>
           </div>
 
           {/* Actions */}

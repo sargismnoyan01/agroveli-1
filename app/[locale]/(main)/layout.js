@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { MobileNavigation } from "@/components/home/MobileNavigation";
+import BalanceAnimation from "@/components/profile/BalanceAnimation";
 
 
 export const viewport = {
@@ -16,6 +18,9 @@ export default function RootLayout({
   return (
     <div className="pb-12 md:pb-0">
       <Header />
+      <Suspense fallback={null}>
+        <BalanceAnimation />
+      </Suspense>
       {children}
       <MobileNavigation />
       <Footer/>

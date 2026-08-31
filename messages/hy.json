@@ -236,7 +236,12 @@
   "loading": "Բեռնվում է...",
   "processing": "Լիցքավորվում է...",
   "failed": "Չհաջողվեց լիցքավորել հաշվեկշիռը",
-  "placeholder": "Օրինակ՝ 100.00"
+  "placeholder": "Օրինակ՝ 100.00",
+  "returnLoading": "Վճարումը հաստատվում է...",
+  "returnSuccess": "Վճարումը հաջողվեց",
+  "returnTitle": "Հաշվեկշիռը լիցքավորվեց",
+  "returnButton": "Վերադառնալ կայք",
+  "returnAuto": "Ավտոմատ վերադարձ կայք {seconds} վայրկյանից"
 },
   "FiltersPage": {
     "title": "Մանրամասն զտում",
