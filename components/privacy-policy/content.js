@@ -66,7 +66,7 @@ export function PrivacyPolicyContent() {
             <PolicyList items={section2Items} />
           </PolicySection>
 
-          {/* Section 3: Data sharing */}
+                    {/* Section 3: Data sharing */}
           <PolicySection number={3} title={t('section3.title')}>
             <p>{t('section3.description1')}</p>
             <p>{t('section3.description2')}</p>
@@ -74,6 +74,12 @@ export function PrivacyPolicyContent() {
             <p>{t('section3.footer')}</p>
           </PolicySection>
 
+          {/* Section 4: Payments and Refund Policy */}
+          {/* Section 9: Payments and Refund Policy */}
+<PolicySection number={9} title={t('section9.title')}>
+  <p>{t('section9.description')}</p>
+  <PolicyList items={t.raw('section9.items')} />
+</PolicySection>
         </div>
       </div>
     </main>
