@@ -76,7 +76,7 @@ export function PrivacyPolicyContent() {
 
           {/* Section 4: Payments and Refund Policy */}
           {/* Section 9: Payments and Refund Policy */}
-<PolicySection number={9} title={t('section9.title')}>
+<PolicySection number={4} title={t('section9.title')}>
   <p>{t('section9.description')}</p>
   <PolicyList items={t.raw('section9.items')} />
 </PolicySection>
