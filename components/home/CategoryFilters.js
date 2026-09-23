@@ -36,13 +36,10 @@ export function CategoryFilters() {
   const [activeFilters, setActiveFilters] = useState(initialFilters);
   const router = useRouter();
 
-  // Опции сортировки теперь получаем через ключи перевода
   const usageOrderOptions = [
     { value: "", label: t("sort.default") },
     { value: "-created_at", label: t("sort.newest") },
     { value: "created_at", label: t("sort.oldest") },
-    { value: "price_dram", label: t("sort.cheap_amd") },
-    { value: "-price_dram", label: t("sort.expensive_amd") },
     { value: "price_lari", label: t("sort.cheap_gel") },
     { value: "-price_lari", label: t("sort.expensive_gel") },
   ]

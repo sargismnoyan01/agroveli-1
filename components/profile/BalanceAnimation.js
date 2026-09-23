@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useDispatch } from "react-redux";
+import Cookies from "js-cookie";
 import {
   authApi,
   useGetProfileQuery,
@@ -103,8 +104,9 @@ export default function BalanceAnimation() {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
+  const token = Cookies.get("accessToken");
   const { data: profile, isSuccess: profileReady, isFetching } =
-    useGetProfileQuery();
+    useGetProfileQuery(undefined, { skip: !token });
   const [confirmSuccess] = useLazyFlittPaymentSuccessQuery();
 
   const [playing, setPlaying] = useState(false);

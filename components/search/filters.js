@@ -78,13 +78,10 @@ export function SearchFilters({
     { value: "Животные", label: t("categories.animals") },
   ];
 
-  // Опции сортировки с переводами
   const usageOrderOptions = [
     { value: "", label: t("sorting.default") },
     { value: "-created_at", label: t("sorting.newest") },
     { value: "created_at", label: t("sorting.oldest") },
-    { value: "price_dram", label: t("sorting.cheapest") },
-    { value: "-price_dram", label: t("sorting.expensive") },
     { value: "price_lari", label: t("sorting.cheapest") },
     { value: "-price_lari", label: t("sorting.expensive") },
   ];
